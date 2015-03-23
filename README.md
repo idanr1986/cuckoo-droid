@@ -1,7 +1,8 @@
 # cuckoo-droid
 CuckooDroid - Automated Android Malware Analysis with Cuckoo Sandbox.
 
-Installation - easy integration script::
+Installation - easy integration script:
+
     git clone --depth=1 https://github.com/cuckoobox/cuckoo.git cuckoo
     cd cuckoo
     git remote add droid https://github.com/idanr1986/cuckoo-droid
