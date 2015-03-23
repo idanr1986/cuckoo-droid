@@ -1,0 +1,18 @@
+{% if "sms" in results.droidmon %}
+     <div class="alert alert-error signature">
+            <h4><a href="javascript:showHide('sms');">{% include "sections/droidmon/images/sms.html" %}  SMS Messages</a></h4>
+            <div id="sms" style="display: none;">
+                <table class="table table-striped table-bordered">
+
+                {% for call in results.droidmon["sms"] %}
+                <tr>
+                    <td><span class="mono">Destination Number:</span></td>
+                    <td><span class="mono">{{call.dest_number}}</span></td>
+                    <td><span class="mono">Message Content:</span></td>
+                    <td><span class="mono">{{call.content}}</span></td>
+                </tr>
+                {% endfor %}
+                </table>
+            </div>
+     </div>
+{% endif %}

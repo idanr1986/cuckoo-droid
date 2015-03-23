@@ -1,0 +1,14 @@
+{% if "android/app/NotificationManager->notify" in results.droidmon  %}
+    <div class="alert alert-warning signature">
+        <h4><a href="javascript:showHide('notifications');">{% include "sections/droidmon/images/notify.html" %}  Sent Notifications</a></h4>
+        <div id="notifications" style="display: none;">
+            <table class="table table-striped table-bordered">
+                {% for call in results.droidmon["android/app/NotificationManager->notify"] %}
+                <tr>
+                    <td><span class="mono">{{call.send_notification}}</span></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endif %}

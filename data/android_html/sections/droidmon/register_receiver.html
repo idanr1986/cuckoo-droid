@@ -1,0 +1,15 @@
+{% if "registered_receivers" in results.droidmon  %}
+     <div class="alert alert-info signature">
+            <h4><a href="javascript:showHide('registerReceiver');">{% include "sections/droidmon/images/broadcast.html" %}  Registered Broadcast Receivers</a></h4>
+            <div id="registerReceiver" style="display: none;">
+                <table class="table table-striped table-bordered">
+                {% for call in results.droidmon["registered_receivers"] %}
+                <tr>
+                    <td><span class="mono">{{call}}</span></td>
+
+                </tr>
+                 {% endfor %}
+                </table>
+            </div>
+     </div>
+    {% endif %}

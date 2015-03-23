@@ -1,0 +1,19 @@
+{% if "SharedPreferences" in results.droidmon %}
+    <div class="alert alert-success signature">
+            <h4><a href="javascript:showHide('shared_preferences');">{% include "sections/droidmon/images/prefrences.html" %}  Shared Preferences</a></h4>
+            <div id="shared_preferences" style="display: none;">
+                <table class="table table-striped table-bordered">
+                <tr>
+                            <td><span class="mono">Key</span></td>
+                            <td><span class="mono">Value</span></td>
+                </tr>
+                {% for call in results.droidmon["SharedPreferences"] %}
+                    <tr>
+                        <td><span class="mono">{{call.key}}</span></td>
+                        <td><span class="mono">{{call.value}}</span></td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+     </div>
+{% endif %}

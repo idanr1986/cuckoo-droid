@@ -1,0 +1,30 @@
+{% if "started_activities" in results.droidmon  %}
+     <div class="alert alert-info signature">
+            <h4><a href="javascript:showHide('start_intent');">{% include "sections/droidmon/images/intent.html" %}  Intents</a></h4>
+            <div id="start_intent" style="display: none;">
+                <table class="table table-striped table-bordered">
+                {% for call in results.droidmon["started_activities"] %}
+                        <table class="table table-striped table-bordered">
+                        {% if "cmp" in call %}
+                           <tr><td><h5>Intent Class: {{call.cmp}}</h5></td></tr>
+                        {% endif %}
+
+                        {% if "act" in call %}
+                            <tr><td>Intent Action: {{call.act}}</td></tr>
+                        {% endif %}
+
+                        {% if "extras" in call %}
+                            <tr><td><h5>Extras:</h5></td></tr>
+                            {% for extra in call.extras %}
+                                <tr><td>{{extra.key}}={{extra.value}}</td></tr>
+                            {% endfor %}
+                        {% endif %}
+                        </table>
+                      &nbsp;
+                      &nbsp;
+                 {% endfor %}
+                </table>
+
+            </div>
+     </div>
+{% endif %}
