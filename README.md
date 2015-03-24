@@ -11,3 +11,5 @@ Installation - easy integration script:
     cat conf-extra/reporting.conf >> conf/reporting.conf
     rm -r conf-extra
     echo "protobuf" >> requirements.txt
+
+CuckooDroid Documentation - http://cuckoo-droid.readthedocs.org/en/latest/
