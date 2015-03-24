@@ -10,6 +10,7 @@ Now it's time to create Linux machines and to configure them properly.
 .. toctree::
 
     architecture
+    host
     creation
     requirements
     network

@@ -9,11 +9,12 @@ machines you will use for malware execution.
 Now it's time to create Android machines and to configure them properly.
 
 .. toctree::
-
-    architecture
-    creation
-    network
-    requirements
-    saving
-    cloning
+	
+	architecture
+	host
+	creation
+	network
+	requirements
+	saving
+	cloning
 

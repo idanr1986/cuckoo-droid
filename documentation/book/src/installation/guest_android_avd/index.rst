@@ -10,6 +10,9 @@ Now it's time to create the Android Emulator and to configure it properly.
 
 .. toctree::
 
-    architecture
-    requirements
+	architecture
+	host
+	requirements
+	
+	
 
