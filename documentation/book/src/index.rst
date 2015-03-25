@@ -4,6 +4,7 @@
 ================
 CuckooDroid Book
 ================
+Contributed By Check Point Software Technologies LTD.
 
 CuckooDroid is an extension of Cuckoo Sandbox the *Open Source* software for automating analysis of suspicious files.
 CuckooDroid brigs to cuckoo the capabilities of execution and analysis of android application.

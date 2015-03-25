@@ -1,10 +1,13 @@
+![Image of cuckoo-droid](https://github.com/idanr1986/cuckoo-droid/blob/master/documentation/book/src/_images/logo/cuckoo.png?raw=true)
+
+
 CuckooDroid - Automated Android Malware Analysis.
 =================================================
 Contributed By Check Point Software Technologies LTD.
 
 CuckooDroid is an extension of Cuckoo Sandbox the Open Source software for automating analysis of suspicious files, CuckooDroid brigs to cuckoo the capabilities of execution and analysis of android application.
 
-Installation - easy integration script:
+Installation - Easy integration script:
 
     git clone --depth=1 https://github.com/cuckoobox/cuckoo.git cuckoo
     cd cuckoo
@@ -19,6 +22,8 @@ Documentation
 =============
 - CuckooDroid - http://cuckoo-droid.readthedocs.org/
 - Cuckoo Sandbox - http://cuckoo.readthedocs.org/
+
+You are advised to read the Cuckoo Sandbox documentation before using CuckooDroid!
 
 Powered by:
 ===========
