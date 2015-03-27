@@ -37,8 +37,4 @@ Credit
 Authors
 =======
 - Idan Revivo - idanr@checkpoint.com (twitter: idanr86)
-<<<<<<< HEAD
-- Ofer Caspi oferc@checkpoint.com (twitter: shablolForce)
-=======
 - Ofer Caspi oferc@checkpoint.com (twitter: @shablolForce)
->>>>>>> origin/master
