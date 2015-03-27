@@ -8,7 +8,8 @@ Contributed By Check Point Software Technologies LTD.
 CuckooDroid is an extension of Cuckoo Sandbox the Open Source software for automating analysis of suspicious files, CuckooDroid brigs to cuckoo the capabilities of execution and analysis of android application.
 
 Installation - Easy integration script:
-
+	git config --global user.email "you@example.com"
+	git config --global user.name "Your Name"
     git clone --depth=1 https://github.com/cuckoobox/cuckoo.git cuckoo
     cd cuckoo
     git remote add droid https://github.com/idanr1986/cuckoo-droid
