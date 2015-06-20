@@ -69,6 +69,7 @@ class Analyzer(object):
         # we store the path.
         if self.config.category == "file":
             self.target = os.path.join("/tmp", str(self.config.file_name))
+            subprocess.call("adb push config/hooks.json /data/local/tmp/",shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # If it's a URL, well.. we store the URL.
         else:
             self.target = self.config.target
