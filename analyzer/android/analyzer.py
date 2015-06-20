@@ -5,6 +5,7 @@
 import os
 import logging
 import pkgutil
+import shutil
 import subprocess
 import xmlrpclib
 import time
@@ -69,6 +70,7 @@ class Analyzer(object):
         # we store the path.
         if self.config.category == "file":
             self.target = os.path.join("/data/local/tmp", str(self.config.file_name))
+            shutil.copyfile("config/hooks.json", "/data/local/tmp/hooks.json")
         # If it's a URL, well.. we store the URL.
         else:
             self.target = self.config.target
