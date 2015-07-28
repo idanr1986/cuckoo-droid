@@ -1,0 +1,25 @@
+<section id="domains">
+    <h4>DNS</h4>
+    {% if analysis.network.dns %}
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>Name</th>
+                <th>Response</th>
+                <th>Post-Analysis Lookup</th>
+            </tr>
+            {% for p in analysis.network.dns %}
+                <tr>
+                    <td>{{p.request}}</td>
+                    <td>
+                        {% for a in p.answers %}
+                            {{a.type}} {{a.data|linebreaksbr}}{% if not forloop.last %}<br/>{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ domainlookups|get_item:p.request }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No domains contacted.</p>
+    {% endif %}
+</section>

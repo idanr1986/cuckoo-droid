@@ -1,0 +1,11 @@
+<section id="file_accessed">
+    <div class="alert alert-success signature">
+        <table class="table table-striped table-bordered">
+        {% for call in analysis.droidmon.file_accessed %}
+        <tr>
+            <td><span class="mono" >{{call}}</span></td>
+        </tr>
+        {% endfor %}
+        </table>
+        </div>
+</section>

@@ -1,0 +1,11 @@
+<section id="content_resolver">
+    <div class="alert alert-warning signature">
+        <table class="table table-striped table-bordered">
+        {% for call in analysis.droidmon.ContentResolver_queries %}
+        <tr>
+            <td><span class="mono" >{{call}}</span></td>
+        </tr>
+        {% endfor %}
+        </table>
+        </div>
+</section>
