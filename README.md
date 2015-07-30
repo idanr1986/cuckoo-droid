@@ -11,7 +11,7 @@ Installation - Easy integration script:
 
     git config --global user.email "you@example.com"
     git config --global user.name "Your Name"
-    git clone --depth=1 https://github.com/cuckoobox/cuckoo.git cuckoo
+    git clone --depth=1 https://github.com/cuckoobox/cuckoo.git cuckoo -b 1.2
     cd cuckoo
     git remote add droid https://github.com/idanr1986/cuckoo-droid
     git pull --no-edit -s recursive -X theirs droid master 
