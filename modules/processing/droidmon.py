@@ -11,25 +11,28 @@ class Droidmon(Processing):
     """Extract Dynamic API calls Info From Droidmon logs."""
 
     def __init__(self):
+        self.key = "droidmon"
+
         self.droidmon = {}
 
         self.droidmon["crypto_keys"] = []
         self.droidmon["reflection_calls"] = set()
         self.droidmon["SystemProperties"] = set()
         self.droidmon["started_activities"] = []
-        self.droidmon["file_accessed"]=set()
-        self.droidmon["fingerprint"]=set()
-        self.droidmon["registered_receivers"]=set()
-        self.droidmon["SharedPreferences"]=[]
-        self.droidmon["ContentResolver_queries"]=set()
-        self.droidmon["ContentValues"]=[]
-        self.droidmon["encoded_base64"]=[]
-        self.droidmon["decoded_base64"]=[]
-        self.droidmon["commands"]=set()
-        self.droidmon["ComponentEnabledSetting"]=[]
-        self.droidmon["data_leak"]=set()
-        self.droidmon["events"]=set()
-        self.droidmon["crypto_data"]=[]
+        self.droidmon["file_accessed"] = set()
+        self.droidmon["fingerprint"] = set()
+        self.droidmon["registered_receivers"] = set()
+        self.droidmon["SharedPreferences"] = []
+        self.droidmon["ContentResolver_queries"] = set()
+        self.droidmon["ContentValues"] = []
+        self.droidmon["encoded_base64"] = []
+        self.droidmon["decoded_base64"] = []
+        self.droidmon["commands"] = set()
+        self.droidmon["commands_output"] = set()
+        self.droidmon["ComponentEnabledSetting"] = []
+        self.droidmon["data_leak"] = set()
+        self.droidmon["events"] = set()
+        self.droidmon["crypto_data"] = []
         self.droidmon["mac_data"]=[]
         self.droidmon["handleReceiver"]=[]
         self.droidmon["sms"]=[]
@@ -49,7 +52,73 @@ class Droidmon(Processing):
         self.droidmon["error"]=[]
         self.droidmon["raw"]=[]
 
-    def android_os_SystemProperties_get(self,api_call):
+        self.log_hook_method_map = {}
+        self.log_hook_method_map["android.os.SystemProperties_get"] = self.android_os_SystemProperties_get
+        self.log_hook_method_map["javax.crypto.spec.SecretKeySpec_javax.crypto.spec.SecretKeySpec"] = self.javax_crypto_spec_SecretKeySpec_javax_crypto_spec_SecretKeySpec
+        self.log_hook_method_map["javax.crypto.Cipher_doFinal"] = self.javax_crypto_Cipher_doFinal
+        self.log_hook_method_map["java.lang.reflect.Method_invoke"] = self.java_lang_reflect_Method_invoke
+        self.log_hook_method_map["dalvik.system.BaseDexClassLoader_findResource"] = self.dalvik_system_BaseDexClassLoader_findResource
+        self.log_hook_method_map["android.app.Activity_startActivity"] = self.android_app_Activity_startActivity
+        self.log_hook_method_map["java.lang.Runtime_exec"] = self.java_lang_Runtime_exec
+        self.log_hook_method_map["java.lang.ProcessBuilder_start"] = self.java_lang_ProcessBuilder_start
+        self.log_hook_method_map["libcore.io.IoBridge_open"] = self.libcore_io_IoBridge_open
+        self.log_hook_method_map["android.app.ActivityThread_handleReceiver"] = self.android_app_ActivityThread_handleReceiver
+        self.log_hook_method_map["android.app.ContextImpl_registerReceiver"] = self.android_app_ContextImpl_registerReceiver
+        self.log_hook_method_map["android.telephony.TelephonyManager_getDeviceId"] = self.android_telephony_TelephonyManager_getDeviceId
+        self.log_hook_method_map["android.telephony.TelephonyManager_getNetworkOperatorName"] = self.android_telephony_TelephonyManager_getNetworkOperatorName
+        self.log_hook_method_map["android.telephony.TelephonyManager_getSubscriberId"] = self.android_telephony_TelephonyManager_getSubscriberId
+        self.log_hook_method_map["android.telephony.TelephonyManager_getLine1Number"] = self.android_telephony_TelephonyManager_getLine1Number
+        self.log_hook_method_map["android.telephony.TelephonyManager_getNetworkOperator"] = self.android_telephony_TelephonyManager_getNetworkOperator
+        self.log_hook_method_map["android.telephony.TelephonyManager_getSimOperatorName"] = self.android_telephony_TelephonyManager_getSimOperatorName
+        self.log_hook_method_map["android.telephony.TelephonyManager_getSimCountryIso"] = self.android_telephony_TelephonyManager_getSimCountryIso
+        self.log_hook_method_map["android.telephony.TelephonyManager_getSimSerialNumber"] = self.android_telephony_TelephonyManager_getSimSerialNumber
+        self.log_hook_method_map["android.telephony.TelephonyManager_getNetworkCountryIso"] = self.android_telephony_TelephonyManager_getNetworkCountryIso
+        self.log_hook_method_map["android.telephony.TelephonyManager_getDeviceSoftwareVersion"] = self.android_telephony_TelephonyManager_getDeviceSoftwareVersion
+        self.log_hook_method_map["android.net.wifi.WifiInfo_getMacAddress"] = self.android_net_wifi_WifiInfo_getMacAddress
+        self.log_hook_method_map["android.app.SharedPreferencesImpl$EditorImpl_putInt"] = self.android_app_SharedPreferencesImpl_EditorImpl_putInt
+        self.log_hook_method_map["android.app.SharedPreferencesImpl$EditorImpl_putString"] = self.android_app_SharedPreferencesImpl_EditorImpl_putString
+        self.log_hook_method_map["android.app.SharedPreferencesImpl$EditorImpl_putFloat"] = self.android_app_SharedPreferencesImpl_EditorImpl_putFloat
+        self.log_hook_method_map["android.app.SharedPreferencesImpl$EditorImpl_putBoolean"] = self.android_app_SharedPreferencesImpl_EditorImpl_putBoolean
+        self.log_hook_method_map["android.app.SharedPreferencesImpl$EditorImpl_putLong"] = self.android_app_SharedPreferencesImpl_EditorImpl_putLong
+        self.log_hook_method_map["android.content.ContentResolver_query"] = self.android_content_ContentResolver_query
+        self.log_hook_method_map["android.telephony.TelephonyManager_getSubscriberId"] = self.android_telephony_TelephonyManager_getSubscriberId
+        self.log_hook_method_map["android.content.ContentValues_put"] = self.android_content_ContentValues_put
+        self.log_hook_method_map["android.telephony.TelephonyManager_getNetworkCountryIso"] = self.android_telephony_TelephonyManager_getNetworkCountryIso
+        self.log_hook_method_map["javax.crypto.Mac_doFinal"] = self.javax_crypto_Mac_doFinal
+        self.log_hook_method_map["android.util.Base64_encodeToString"] = self.android_util_Base64_encodeToString
+        self.log_hook_method_map["android.util.Base64_encode"] = self.android_util_Base64_encode
+        self.log_hook_method_map["android.app.ApplicationPackageManager_setComponentEnabledSetting"] = self.android_app_ApplicationPackageManager_setComponentEnabledSetting
+        self.log_hook_method_map["android.location.Location_getLatitude"] = self.android_location_Location_getLatitude
+        self.log_hook_method_map["android.location.Location_getLongitude"] = self.android_location_Location_getLongitude
+        self.log_hook_method_map["android.app.ApplicationPackageManager_getInstalledPackages"] = self.android_app_ApplicationPackageManager_getInstalledPackages
+        self.log_hook_method_map["dalvik.system.BaseDexClassLoader_findLibrary"] = self.dalvik_system_BaseDexClassLoader_findLibrary
+        self.log_hook_method_map["android.telephony.SmsManager_sendTextMessage"] = self.android_telephony_SmsManager_sendTextMessage
+        self.log_hook_method_map["android.util.Base64_decode"] = self.android_util_Base64_decode
+        self.log_hook_method_map["android.telephony.TelephonyManager_listen"] = self.android_telephony_TelephonyManager_listen
+        self.log_hook_method_map["android.content.ContentResolver_registerContentObserver"] = self.android_content_ContentResolver_registerContentObserver
+        self.log_hook_method_map["android.content.ContentResolver_insert"] = self.android_content_ContentResolver_insert
+        self.log_hook_method_map["android.accounts.AccountManager_getAccountsByType"] = self.android_accounts_AccountManager_getAccountsByType
+        self.log_hook_method_map["dalvik.system.BaseDexClassLoader_findResources"] = self.dalvik_system_BaseDexClassLoader_findResources
+        self.log_hook_method_map["android.accounts.AccountManager_getAccounts"] = self.android_accounts_AccountManager_getAccounts
+        self.log_hook_method_map["android.telephony.SmsManager_sendMultipartTextMessage"] = self.android_telephony_SmsManager_sendMultipartTextMessage
+        self.log_hook_method_map["android.content.ContentResolver_delete"] = self.android_content_ContentResolver_delete
+        self.log_hook_method_map["android.media.AudioRecord_startRecording"] = self.android_media_AudioRecord_startRecording
+        self.log_hook_method_map["android.media.MediaRecorder_start"] = self.android_media_MediaRecorder_start
+        self.log_hook_method_map["android.content.BroadcastReceiver_abortBroadcast"] = self.android_content_BroadcastReceiver_abortBroadcast
+        self.log_hook_method_map["dalvik.system.DexFile_loadDex"] = self.dalvik_system_DexFile_loadDex
+        self.log_hook_method_map["dalvik.system.DexClass.dalvik.system_DexClassLoader"] = self.dalvik_system_DexClass_dalvik_system_DexClassLoader
+        self.log_hook_method_map["dalvik.system.DexFile.dalvik.system_DexFile"] = self.dalvik_system_DexFile_dalvik_system_DexFile
+        self.log_hook_method_map["dalvik.system.PathClassLoader.dalvik.system_PathClassLoader"] = self.dalvik_system_PathClassLoader_dalvik_system_PathClassLoader
+        self.log_hook_method_map["android.app.ActivityManager_killBackgroundProcesses"] = self.android_app_ActivityManager_killBackgroundProcesses
+        self.log_hook_method_map["android.os.Process_killProcess"] = self.android_os_Process_killProcess
+        self.log_hook_method_map["android.net.ConnectivityManager_setMobileDataEnabled"] = self.android_net_ConnectivityManager_setMobileDataEnabled
+        self.log_hook_method_map["org.apache.http.impl.client.AbstractHttpClient_execute"] = self.org_apache_http_impl_client_AbstractHttpClient_execute
+        self.log_hook_method_map["java.net.URL_openConnection"] = self.java_net_URL_openConnection
+        self.log_hook_method_map["dalvik.system.DexFile.loadClass"] = self.dalvik_system_DexFile_loadClass
+        self.log_hook_method_map["java.io.FileInputStream_read"] = self.java_io_FileInputStream_read
+        self.log_hook_method_map["java.io.FileOutputStream_write"] = self.java_io_FileOutputStream_write
+
+    def android_os_SystemProperties_get(self, api_call):
         self.droidmon["SystemProperties"].add(api_call["args"][0])
 
     def javax_crypto_spec_SecretKeySpec_javax_crypto_spec_SecretKeySpec(self,api_call):
@@ -59,24 +128,25 @@ class Droidmon(Processing):
             if key in current_key["key"]:
                 exists=True
                 break
-        if not exists :
-            new_key={}
+        if not exists:
+            new_key = {}
             new_key["key"]=api_call["args"][0]
             new_key["type"]=api_call["args"][1]
             self.droidmon["crypto_keys"].append(new_key)
 
     def javax_crypto_Cipher_doFinal(self,api_call):
-        if(api_call["this"]["mode"]== 1):
+
+        if api_call["this"]["mode"] == 1:
             self.droidmon["crypto_data"].append(api_call["args"][0])
         else:
-            self.droidmon["crypto_data"].append(api_call["return"])
+            self.droidmon["crypto_data"].append(api_call["result"])
 
     def java_lang_reflect_Method_invoke(self,api_call):
-        reflection=""
-        if("hooked_class" in api_call ):
-            reflection=api_call["hooked_class"]+"->"+api_call["hooked_method"]
+        reflection = ""
+        if "hooked_class" in api_call:
+            reflection = api_call["hooked_class"]+"->"+api_call["hooked_method"]
         else:
-            reflection=api_call["hooked_method"]
+            reflection = api_call["hooked_method"]
         self.droidmon["reflection_calls"].add(reflection)
 
     def dalvik_system_BaseDexClassLoader_findResource(self,api_call):
@@ -103,8 +173,10 @@ class Droidmon(Processing):
         self.droidmon["handleReceiver"].append(api_call["args"][0])
 
     def android_app_ContextImpl_registerReceiver(self,api_call):
-        for action in api_call["args"][1]["mActions"]:
-            self.droidmon["registered_receivers"].add(action)
+        for arg in api_call["args"]:
+            if "mActions" in arg:
+                for action in arg["mActions"]:
+                    self.droidmon["registered_receivers"].add(action)
 
     def android_telephony_TelephonyManager_getDeviceId(self,api_call):
         self.droidmon["fingerprint"].add("getDeviceId")
@@ -173,7 +245,7 @@ class Droidmon(Processing):
         self.droidmon["encoded_base64"].append(api_call["args"][0])
 
     def android_util_Base64_encode(self,api_call):
-        self.droidmon["encoded_base64"].append(api_call["return"][0])
+        self.droidmon["encoded_base64"].append(api_call["result"][0])
 
     def android_app_ApplicationPackageManager_setComponentEnabledSetting(self,api_call):
         new_pair={}
@@ -208,7 +280,7 @@ class Droidmon(Processing):
         self.droidmon["sms"].append(new_pair)
 
     def android_util_Base64_decode(self,api_call):
-        self.droidmon["decoded_base64"].append(api_call["return"])
+        self.droidmon["decoded_base64"].append(api_call["result"])
 
     def android_telephony_TelephonyManager_listen(self,api_call):
         event =  api_call["args"][1];
@@ -287,19 +359,35 @@ class Droidmon(Processing):
             json["request"]=api_call["args"][1]
         else:
             json["request"]=api_call["args"][0]
-        json["response"]=api_call["return"]
+        json["response"]=api_call["result"]
         self.droidmon["httpConnections"].append(json)
 
-    def java_net_URL_openConnection(self,api_call):
-        json = {}
-        json["request"]=api_call["this"]
-        json["response"]=api_call["return"]
+    def java_net_URL_openConnection(self, api_call):
         if("file:" in api_call["this"] or "jar:" in api_call["this"]):
             return
+
+        json = {}
+        if api_call["result"] != "":
+            json["request"] = api_call["result"]["request_method"] + " " + api_call["this"] + " " + api_call["result"]["version"]
+            json["response"] = api_call["result"]["version"] + " " + str(api_call["result"]["response_code"]) + " " + api_call["result"]["response_message"]
+        else:
+            json["request"] = "GET " + api_call["this"] + " HTTP/1.1"
+            json["response"] = ""
         self.droidmon["httpConnections"].append(json)
 
     def dalvik_system_DexFile_loadClass(self,api_call):
         self.droidmon["loadClass"].add(api_call["args"][0])
+
+    def java_io_FileOutputStream_write(self,api_call):
+        #self.droidmon["command_objects"].append(api_call)
+        commands = api_call["buffer"].split('\n')
+        for command in commands:
+            self.droidmon["commands"].add(command)
+
+    def java_io_FileInputStream_read(self,api_call):
+        pass
+        #self.droidmon["command_objects"].append(api_call)
+        self.droidmon["commands_output"].add("read: "+api_call["buffer"])
 
     def get_pair(self,api_call):
         new_pair={}
@@ -318,8 +406,8 @@ class Droidmon(Processing):
         if not exists :
             new_pair={}
             new_pair["libname"]=api_call["args"][0]
-            if "return" in api_call:
-                new_pair["result"]=api_call["return"]
+            if "result" in api_call:
+                new_pair["result"]=api_call["result"]
             else:
                 new_pair["result"]=""
             self.droidmon[key].append(new_pair)
@@ -342,43 +430,37 @@ class Droidmon(Processing):
         """Run extract of printable strings.
         @return: list of printable strings.
         """
-        self.key = "droidmon"
 
-        if ("file" not in self.task["category"]):
+        if "file" not in self.task["category"]:
             return self.droidmon
 
-        #if not("apk" in choose_package(File(self.task["target"]).get_type(),File(self.task["target"]).get_name())):
-        #    return api_calls_map
-        results={}
-
-        log_path=self.logs_path+"/droidmon.log"
+        results = {}
+        log_path = self.logs_path + "/droidmon.log"
         if not os.path.exists(log_path):
             return results
 
-        try :
+        try:
             with open(log_path) as log_file:
                 for line in log_file:
                     try:
-                        api_call =json.loads(line)
+                        api_call = json.loads(line)
                         self.droidmon["raw"].append(self.keyCleaner(api_call))
                         call = api_call["class"]+"_"+api_call["method"]
-                        call = call.replace(".","_")
-                        call = call.replace("$","_")
-                        try:
-                            func = getattr(self, call)
+                        if call in self.log_hook_method_map:
+                            func = self.log_hook_method_map[call]
                             func(api_call)
-                        except Exception as e:
-                            self.droidmon["error"].append(e.message+" "+line)
+                        else:
+                            self.droidmon["error"].append(line)
                     except Exception as e:
-                        log.error(CuckooProcessingError("error parsing json line: %s" % line + " error" +e.message))
+                        log.error(CuckooProcessingError("error parsing json line: %s" % line + " error" + e.message))
         except Exception as e:
             raise CuckooProcessingError("Error opening file %s" % e)
 
         for key in self.droidmon.keys():
             if len(self.droidmon[key]) > 0:
                 if type(self.droidmon[key]) is list:
-                    results[key]=self.droidmon[key]
+                    results[key] = self.droidmon[key]
                 else:
-                    results[key]=list(self.droidmon[key])
+                    results[key] = list(self.droidmon[key])
 
         return results
