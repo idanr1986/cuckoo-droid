@@ -5,7 +5,10 @@
         <li><a href="#api_calls_tab" data-toggle="tab">Android Static API Calls</a></li>
         {% if  analysis.apkinfo.certificate %}
         <li><a href="#certificate_tab" data-toggle="tab">Certificate</a></li>
-         {% endif %}
+        {% endif %}
+        {% if  analysis.apkinfo.files %}
+        <li><a href="#files_tab" data-toggle="tab">Files</a></li>
+        {% endif %}
         {% endif %}
         {% if analysis.info.category == "file" and not analysis.apkinfo %}<li><a href="#static_analysis_tab" data-toggle="tab">Static Analysis</a></li>{% endif %}
 
@@ -43,6 +46,9 @@
             {% include "analysis/static/_certificate.html" %}
         </div>
 
+        <div class="tab-pane fade" id="files_tab">
+            {% include "analysis/static/_files.html" %}
+        </div>
         {% endif %}
 
         {% if analysis.googleplay %}
