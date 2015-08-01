@@ -10,7 +10,7 @@ class KnownVirustotal(Signature):
     description = "File has been identified by at least one AntiVirus on VirusTotal as malicious (Osint)"
     severity = 2
     categories = ["antivirus"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):

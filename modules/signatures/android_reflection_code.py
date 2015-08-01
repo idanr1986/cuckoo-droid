@@ -7,14 +7,16 @@ from lib.cuckoo.common.abstracts import Signature
 class AndroidReflectionCode(Signature):
     name = "android_reflection_code"
     description = "Application Uses Reflection Methods (Static)"
-    severity = 3
+    severity = 2
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
             if self.results["apkinfo"]["static_method_calls"]["is_reflection_code"] is True:
+                for call in self.results["apkinfo"]["static_method_calls"]["reflection_method_calls"]:
+                    self.add_match(None,"Static API Call", call)
                 return True
             else:
                 return False

@@ -9,7 +9,7 @@ class AndroidAbortBroadcast(Signature):
     description = "Application Aborted Broadcast Receiver (Dynamic)"
     severity = 2
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):

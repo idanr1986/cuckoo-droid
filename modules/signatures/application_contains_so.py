@@ -1,12 +1,16 @@
 # Copyright (C) Check Point Software Technologies LTD.
 # This file is part of Cuckoo Sandbox - http://www.cuckoosandbox.org
 # See the file 'docs/LICENSE' for copying permission.
+import os
 
 from lib.cuckoo.common.abstracts import Signature
 
-class AndroidStopProcess(Signature):
-    name = "application_stopped_processes"
-    description = "Application Stopped Processes (Dynamic)"
+
+
+
+class Hidden_Payload(Signature):
+    name = "application_contains_so"
+    description = "Application Contains Shared Object Files (Static)"
     severity = 2
     categories = ["android"]
     authors = ["idanr1986"]
@@ -14,9 +18,9 @@ class AndroidStopProcess(Signature):
 
     def run(self):
         try:
-            if "killed_process" in self.results["droidmon"]:
-                return True
-            else:
-                return False
+            for file in self.results["apkinfo"]["files_flaged"]["so"]:
+                self.add_match(None,file["name"], file)
+            return self.has_matches()
+
         except:
             return False

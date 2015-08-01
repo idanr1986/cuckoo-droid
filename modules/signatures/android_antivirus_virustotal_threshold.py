@@ -9,7 +9,7 @@ class KnownVirustotalThreshold(Signature):
     description = "File has been identified by more the 10 AntiVirus on VirusTotal as malicious (Osint)"
     severity = 4
     categories = ["antivirus"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
@@ -23,6 +23,7 @@ class KnownVirustotalThreshold(Signature):
                 for key in self.results["virustotal"]["scans"].keys():
                     if(key in AvWhiteList):
                         if(self.results["virustotal"]["scans"][key]["detected"]==True):
+                            self.add_match(None,key,self.results["virustotal"]["scans"][key]["result"])
                             avCounter=avCounter+1
 
             if(avCounter>=counterThreshold):

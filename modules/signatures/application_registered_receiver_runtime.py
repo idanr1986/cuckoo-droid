@@ -9,12 +9,14 @@ class AndroidRegisteredReceiver(Signature):
     description = "Application Registered Receiver In Runtime (Dynamic)"
     severity = 2
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
             if "registered_receivers" in self.results["droidmon"]:
+                for receiver in self.results["droidmon"]["registered_receivers"]:
+                    self.add_match(None,"Receiver", receiver)
                 return True
             else:
                 return False

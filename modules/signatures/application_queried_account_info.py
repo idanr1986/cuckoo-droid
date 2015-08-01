@@ -9,14 +9,20 @@ class AndroidAccountInfo(Signature):
     description = "Application Queried Account Information (Dynamic)"
     severity = 2
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
+            if "accounts" in self.results["droidmon"]:
+                for account in self.results["droidmon"]["accounts"]:
+                    self.add_match(None, "Account", account)
+
             if "getAccounts" in self.results["droidmon"]["data_leak"]:
-                return True
-            else:
-                return False
+                self.add_match(None, "Dynamic API Call", "getAccounts()")
         except:
-            return False
+            pass
+
+        finally:
+            return self.has_matches()
+

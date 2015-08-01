@@ -9,12 +9,14 @@ class AndroidPrivateInfoQuery(Signature):
     description = "Application Queried Private Information (Dynamic)"
     severity = 2
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
             if "ContentResolver_queries" in self.results["droidmon"]:
+                for query in self.results["droidmon"]["ContentResolver_queries"]:
+                    self.add_match(None,"Query", query)
                 return True
             else:
                 return False

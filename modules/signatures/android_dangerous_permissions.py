@@ -9,7 +9,7 @@ class AndroidDangerousPermissions(Signature):
     description = "Application Asks For Dangerous Permissions (Static)"
     severity = 3
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
@@ -19,6 +19,7 @@ class AndroidDangerousPermissions(Signature):
                 if("dangerous" in perm["severity"]):
                     if not ("Unknown" in perm["action"]):
                         references.append(perm)
+                        self.add_match(None,perm["name"], perm["description"])
 
             if len(references)>0:
                 return True

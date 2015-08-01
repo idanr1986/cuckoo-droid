@@ -9,12 +9,14 @@ class AndroidSMS(Signature):
     description = "Application Sending SMS messages (Dynamic)"
     severity = 3
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
             if "sms" in self.results["droidmon"]:
+                for sms in self.results["droidmon"]["sms"]:
+                    self.add_match(None,sms["dest_number"], sms["content"])
                 return True
             else:
                 return False

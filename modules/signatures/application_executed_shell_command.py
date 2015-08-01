@@ -9,12 +9,14 @@ class AndroidShellCommands(Signature):
     description = "Application Executed Shell Command (Dynamic)"
     severity = 4
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
             if "commands" in self.results["droidmon"]:
+                for command in self.results["droidmon"]["commands"]:
+                    self.add_match(None, "Command", command)
                 return True
             else:
                 return False

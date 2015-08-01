@@ -9,12 +9,14 @@ class AndroidNativeCode(Signature):
     description = "Application Uses Native Jni Methods (Static)"
     severity = 2
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
             if self.results["apkinfo"]["static_method_calls"]["is_native_code"] is True:
+                for call in self.results["apkinfo"]["static_method_calls"]["native_method_calls"]:
+                    self.add_match(None,"Static API Call", call)
                 return True
             else:
                 return False

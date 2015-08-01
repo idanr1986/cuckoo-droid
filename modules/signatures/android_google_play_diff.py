@@ -9,7 +9,7 @@ class AndroidGooglePlayDiff(Signature):
     description = "Application Permissions On Google Play Differ (Osint)"
     severity = 3
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):

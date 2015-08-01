@@ -4,17 +4,18 @@
 
 from lib.cuckoo.common.abstracts import Signature
 
-class AndroidPhoneNumber(Signature):
-    name = "application_queried_phone_number"
-    description = "Application Queried Phone Number (Dynamic)"
-    severity = 1
+
+class AndroidInstalledApps(Signature):
+    name = "application_device_admin"
+    description = "Application Requested Device Administrator (Dynamic)"
+    severity = 5
     categories = ["android"]
-    authors = ["Check Point Software Technologies LTD"]
+    authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
-            if "getLine1Number" in self.results["droidmon"]["fingerprint"]:
+            if "Device Admin Granted" in self.results["debug"]["log"]:
                 return True
             else:
                 return False
