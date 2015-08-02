@@ -35,8 +35,11 @@ class TouchSimulator(Auxiliary, Thread):
             if adb.check_package_on_top("com.android.settings/.DeviceAdminAdd"):
                 log.info("TouchSimulator - Device Admin Granted")
                 adb.simulate_touch("386","753")
-            if adb.check_package_on_top("com.android.packageinstaller/.PackageInstallerActivity") or adb.check_package_on_top("com.android.packageinstaller/.InstallAppProgress"):
+            elif adb.check_package_on_top("com.android.packageinstaller/.PackageInstallerActivity") or adb.check_package_on_top("com.android.packageinstaller/.InstallAppProgress"):
                 log.info("TouchSimulator - Package Installer")
                 adb.simulate_touch("386","753")
+            elif adb.check_package_on_top("com.noshufou.android.su/.SuRequestActivity"):
+                log.info("TouchSimulator - SuperSU Root Granted")
+                adb.simulate_touch("386","553")
         return True
 
