@@ -1,5 +1,7 @@
 ![Image of cuckoo-droid](https://github.com/idanr1986/cuckoo-droid/blob/master/documentation/book/src/_images/logo/cuckoo.png?raw=true)
 
+![Arsenal](https://www.toolswatch.org/badges/arsenal/2015.svg)
+![Arsenal](https://www.toolswatch.org/badges/arsenal/2016.svg)
 
 CuckooDroid - Automated Android Malware Analysis.
 =================================================
