@@ -161,7 +161,13 @@
             "method": null, 
             "thisObject": false, 
             "type": "dex"
-        }, 
+        },
+        {
+            "class_name": "dalvik.system.DexClassLoader",
+            "method": "load",
+            "thisObject": false,
+            "type": "dex"
+        },
         {
             "class_name": "dalvik.system.BaseDexClassLoader", 
             "method": "findResources", 
@@ -383,7 +389,122 @@
             "method": "open", 
             "thisObject": false, 
             "type": "file"
+        },
+        {
+            "class_name": "libcore.io.IoBridge",
+            "method": "close",
+            "thisObject": true,
+            "type": "file"
+        },
+        {
+            "class_name": "android.app.ActivityManager",
+            "method": "getRunningAppProcesses",
+            "thisObject": false,
+            "type": "binder"
+        },
+        {
+            "class_name": "android.app.ActivityManager",
+            "method": "getRunningTasks",
+            "thisObject": false,
+            "type": "binder"
+        },
+        {
+            "class_name": "dalvik.system.DexFile", 
+            "method": "openDexFile", 
+            "thisObject": false, 
+            "type": "dex"
+        },
+        {
+            "class_name": "java.lang.Runtime", 
+            "method": "load", 
+            "thisObject": false, 
+            "type": "dex"
+        },
+        {
+            "class_name": "android.os.Process", 
+            "method": "start", 
+            "thisObject": false, 
+            "type": "runtime"
+        },
+        {
+            "class_name": "android.content.ContextWrapper", 
+            "method": "startActivities", 
+            "thisObject": false, 
+            "type": "binder"
+        },
+        {
+            "class_name": "android.content.ContextWrapper", 
+            "method": "startService", 
+            "thisObject": false, 
+            "type": "binder"
+        },
+        {
+            "class_name": "android.content.ContextWrapper", 
+            "method": "startActivity", 
+            "thisObject": false, 
+            "type": "binder"
+        },
+        {
+            "class_name": "android.content.ContextWrapper", 
+            "method": "sendBroadcast", 
+            "thisObject": false, 
+            "type": "binder"
+        },
+        {
+            "class_name": "java.net.ProxySelectorImpl", 
+            "method": "select", 
+            "thisObject": false, 
+            "type": "generic"
+        },
+        {
+            "class_name": "org.apache.http.impl.client.DefaultHttpClient", 
+            "method": "switch_proxy", 
+            "thisObject": false, 
+            "type": "generic"
+        },
+        {
+            "class_name": "android.webkit.WebView", 
+            "method": "addJavascriptInterface", 
+            "thisObject": false, 
+            "type": "network"
+        },
+        {
+            "class_name": "android.webkit.WebView", 
+            "method": "setWebChromeClient", 
+            "thisObject": false, 
+            "type": "network"
+        },
+        {
+            "class_name": "android.webkit.WebView", 
+            "method": "setWebViewClient", 
+            "thisObject": false, 
+            "type": "network"
+        },
+        {
+            "class_name": "android.content.ContextWrapper", 
+            "method": "openFileOutput", 
+            "thisObject": false, 
+            "type": "file"
+        },
+        {
+            "class_name": "android.app.AlarmManager", 
+            "method": "setAlarmClock", 
+            "thisObject": false, 
+            "type": "runtime"
+        },
+        {
+            "class_name": "android.app.AlarmManager", 
+            "method": "set", 
+            "thisObject": false, 
+            "type": "file"
+        },
+        {
+            "class_name": "java.io.File", 
+            "method": "exists", 
+            "thisObject": true, 
+            "type": "file"
         }
+            
     ], 
     "trace": false
 }
