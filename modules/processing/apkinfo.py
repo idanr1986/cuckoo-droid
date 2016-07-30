@@ -2,20 +2,30 @@
 # This file is part of Cuckoo Sandbox - http://www.cuckoosandbox.org
 # See the file 'docs/LICENSE' for copying permission.
 import base64
+import hashlib
 import os
 import logging
 from zipfile import BadZipfile, ZipFile
 import zipfile
+from lib.cuckoo.api.DexDumper.DexDumper import string_dumper
+from lib.cuckoo.api.androguard_extentions import get_show_NativeMethods, get_show_CryptoCode, get_show_Permissions, \
+    get_show_ReflectionCode, get_show_DynCode, get_methods, get_extended_receivers, get_permissions
+from lib.cuckoo.api.certificate import get_certificate
+from lib.cuckoo.api.intresting_strings import find_strings
 
-from analyzer.android_on_linux.lib.api.androguard import apk
-from analyzer.android_on_linux.lib.api.androguard import analysis
-from analyzer.android_on_linux.lib.api.androguard import dvm
-from lib.api.certificate import get_certificate
+try:
+    from androguard.core.bytecodes.apk import APK
+    from androguard.core.bytecodes.dvm import DalvikVMFormat
+    from androguard.core.analysis.analysis import uVMAnalysis, PathVar, TAINTED_PACKAGE_CALL, is_crypto_code
+    from androguard.core.analysis import analysis
+    from androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
+    HAVE_ANDROGUARD = True
+except ImportError:
+    HAVE_ANDROGUARD = False
+
 from lib.cuckoo.common.objects import File
-from analyzer.android_on_linux.lib.core.packages import choose_package
 from lib.cuckoo.common.abstracts import Processing
 from lib.cuckoo.common.exceptions import CuckooProcessingError
-
 
 def get_apk_icon(filepath):
     zfile = zipfile.ZipFile(filepath)
@@ -80,17 +90,17 @@ class ApkInfo(Processing):
             if "exe" not in fileExtension:
                 return True
         else:
-            if "apk" in fileExtension:
+            if ".apk" == fileExtension:
                 self.files_name_map["apk"].append(file)
-            elif "jar" in fileExtension:
+            elif ".jar" == fileExtension:
                 self.files_name_map["jar"].append(file)
-            elif "so" in fileExtension:
+            elif ".so" == fileExtension:
                 self.files_name_map["so"].append(file)
-            elif "ko" in fileExtension:
+            elif ".ko" == fileExtension:
                 self.files_name_map["ko"].append(file)
-            elif "exe" in fileExtension:
+            elif ".exe" == fileExtension:
                 self.files_name_map["exe"].append(file)
-            elif "dex" in fileExtension:
+            elif ".dex" == fileExtension:
                 if file["name"] != "classes.dex":
                     self.files_name_map["dex"].append(file)
 
@@ -108,81 +118,113 @@ class ApkInfo(Processing):
                     return True
         return False
 
+    def _apk_files(self, apk):
+        """Returns a list of files in the APK."""
+        ret = []
+        for fname, filetype in apk.get_files_types().items():
+            buf = apk.zip.read(fname)
+            ret.append({
+                "name": fname,
+                "md5": hashlib.md5(buf).hexdigest(),
+                "size": len(buf),
+                "type": filetype,
+            })
+        return ret
+
+    def _get_strings(self, apk_path):
+        list_string = []
+        for string in string_dumper(apk_path):
+            try:
+                list_string.append(str.decode(string, "utf-8"))
+            except:
+                pass
+
+        return list_string
+
     def run(self):
         """Run androguard to extract static android information
                 @return: list of static features
         """
-
+        self.key = "apkinfo"
         apkinfo = {}
 
-        if ("file" not in self.task["category"]):
+        if "file" not in self.task["category"] or not HAVE_ANDROGUARD:
             return
 
-        if("apk" in choose_package(File(self.task["target"]).get_type(),File(self.task["target"]).get_name())):
-            if not os.path.exists(self.file_path):
+        f = File(self.task["target"])
+        #if f.get_name().endswith((".zip", ".apk")) or "zip" in f.get_type():
+        if not os.path.exists(self.file_path):
                 raise CuckooProcessingError("Sample file doesn't exist: \"%s\"" % self.file_path)
 
             try:
-                a = apk.APK(self.file_path)
+            a = APK(self.file_path)
                 if a.is_valid_APK():
+                manifest = {}
 
-                    manifest ={}
-                    apkinfo["files"]=a.get_files_with_md5()
-                    apkinfo["hidden_payload"]=[]
+                apkinfo["files"] = self._apk_files(a)
+                manifest["package"] = a.get_package()
+                apkinfo["hidden_payload"] = []
+
                     for file in apkinfo["files"]:
                         if self.file_type_check(file):
                            apkinfo["hidden_payload"].append(file)
-                    apkinfo["files_flaged"]=self.files_name_map
-                    manifest["package"]=a.get_package()
-                    manifest["permissions"]=a.get_details_permissions_new()
-                    manifest["main_activity"]=a.get_main_activity()
-                    manifest["activities"]=a.get_activities()
-                    manifest["services"]= a.get_services()
-                    manifest["receivers"]=a.get_receivers()
-                    manifest["receivers_actions"]=a.get__extended_receivers()
-                    manifest["providers"]= a.get_providers()
-                    manifest["libraries"] = a.get_libraries()
-                    apkinfo["manifest"]=manifest
-                    static_calls ={}
-                    if self.check_size(apkinfo["files"]):
-                        vm = dvm.DalvikVMFormat(a.get_dex())
-                        vmx = analysis.uVMAnalysis(vm)
 
-                        static_calls["all_methods"] = self.get_methods(vmx)
+                apkinfo["files_flaged"] = self.files_name_map
+
+                manifest["permissions"]= get_permissions(a)
+                manifest["main_activity"] = a.get_main_activity()
+                manifest["activities"] = a.get_activities()
+                manifest["services"] = a.get_services()
+                manifest["receivers"] = a.get_receivers()
+                manifest["receivers_actions"] = get_extended_receivers(a)
+                manifest["providers"] = a.get_providers()
+                    manifest["libraries"] = a.get_libraries()
+                apkinfo["manifest"] = manifest
+
+                apkinfo["icon"] = get_apk_icon(self.file_path)
+                certificate = get_certificate(self.file_path)
+                if certificate:
+                    apkinfo["certificate"] = certificate
+
+
+                #vm = DalvikVMFormat(a.get_dex())
+                #strings = vm.get_strings()
+                strings = self._get_strings(self.file_path)
+                apkinfo["interesting_strings"] = find_strings(strings)
+                apkinfo["dex_strings"] = strings
+
+                static_calls = {}
+                if self.options.decompilation:
+                    if self.check_size(apkinfo["files"]):
+                        vm = DalvikVMFormat(a.get_dex())
+                        vmx = uVMAnalysis(vm)
+
+                        static_calls["all_methods"] = get_methods(vmx)
                         static_calls["is_native_code"] = analysis.is_native_code(vmx)
                         static_calls["is_dynamic_code"] = analysis.is_dyn_code(vmx)
                         static_calls["is_reflection_code"] = analysis.is_reflection_code(vmx)
+                        static_calls["is_crypto_code"] = is_crypto_code(vmx)
 
-                        static_calls["dynamic_method_calls"] = analysis.get_show_DynCode(vmx)
-                        static_calls["reflection_method_calls"] = analysis.get_show_ReflectionCode(vmx)
-                        static_calls["permissions_method_calls"] = analysis.get_show_Permissions(vmx)
-                        static_calls["crypto_method_calls"] = analysis.get_show_CryptoCode(vmx)
-                        static_calls["native_method_calls"] = analysis.get_show_NativeMethods(vmx)
+                        static_calls["dynamic_method_calls"] = get_show_DynCode(vmx)
+                        static_calls["reflection_method_calls"] = get_show_ReflectionCode(vmx)
+                        static_calls["permissions_method_calls"] = get_show_Permissions(vmx)
+                        static_calls["crypto_method_calls"] = get_show_CryptoCode(vmx)
+                        static_calls["native_method_calls"] = get_show_NativeMethods(vmx)
+
+                        classes = list()
+                        for cls in vm.get_classes():
+                            classes.append(cls.name)
+
+                        static_calls["classes"] = classes
+
                     else:
-                        log.warning("Dex Size Bigger Then: "+str(self.options.decompilation_threshold))
+                    log.warning("Dex size bigger than: %s",
+                                self.options.decompilation_threshold)
+
                     apkinfo["static_method_calls"] = static_calls
-                    certificate = get_certificate(self.file_path)
-                    if certificate:
-                        apkinfo["certificate"] = certificate
-                    apkinfo["icon"]=get_apk_icon(self.file_path)
-            except (IOError, OSError,BadZipfile) as e:
+
+        except (IOError, OSError, BadZipfile) as e:
                 raise CuckooProcessingError("Error opening file %s" % e)
 
         return apkinfo
 
-    def get_methods(self,vmx):
-        methods=[]
-        for i in vmx.get_methods() :
-            method= {}
-            i.create_tags()
-            if not i.tags.empty() :
-                proto =i.method.proto.replace('(','').replace(';','')
-                protos = proto.split(')')
-                params = protos[0].split(' ')
-                method["class"]= i.method.get_class_name().replace(';','')
-                method["name"]=i.method.name
-                if(params.__len__()>0 and params[0]!=""):
-                    method["params"] = params
-                method["return"] = protos[1]
-                methods.append(method)
-        return methods
