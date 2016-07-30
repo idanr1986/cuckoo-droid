@@ -154,20 +154,20 @@ class ApkInfo(Processing):
         f = File(self.task["target"])
         #if f.get_name().endswith((".zip", ".apk")) or "zip" in f.get_type():
         if not os.path.exists(self.file_path):
-                raise CuckooProcessingError("Sample file doesn't exist: \"%s\"" % self.file_path)
+            raise CuckooProcessingError("Sample file doesn't exist: \"%s\"" % self.file_path)
 
-            try:
+        try:
             a = APK(self.file_path)
-                if a.is_valid_APK():
+            if a.is_valid_APK():
                 manifest = {}
 
                 apkinfo["files"] = self._apk_files(a)
                 manifest["package"] = a.get_package()
                 apkinfo["hidden_payload"] = []
 
-                    for file in apkinfo["files"]:
-                        if self.file_type_check(file):
-                           apkinfo["hidden_payload"].append(file)
+                for file in apkinfo["files"]:
+                    if self.file_type_check(file):
+                       apkinfo["hidden_payload"].append(file)
 
                 apkinfo["files_flaged"] = self.files_name_map
 
@@ -178,7 +178,7 @@ class ApkInfo(Processing):
                 manifest["receivers"] = a.get_receivers()
                 manifest["receivers_actions"] = get_extended_receivers(a)
                 manifest["providers"] = a.get_providers()
-                    manifest["libraries"] = a.get_libraries()
+                manifest["libraries"] = a.get_libraries()
                 apkinfo["manifest"] = manifest
 
                 apkinfo["icon"] = get_apk_icon(self.file_path)
@@ -217,14 +217,14 @@ class ApkInfo(Processing):
 
                         static_calls["classes"] = classes
 
-                    else:
+                else:
                     log.warning("Dex size bigger than: %s",
                                 self.options.decompilation_threshold)
 
-                    apkinfo["static_method_calls"] = static_calls
+                apkinfo["static_method_calls"] = static_calls
 
         except (IOError, OSError, BadZipfile) as e:
-                raise CuckooProcessingError("Error opening file %s" % e)
+            raise CuckooProcessingError("Error opening file %s" % e)
 
         return apkinfo
 
