@@ -80,10 +80,10 @@ class Droidmon(Processing):
 
     def _handle_javax_crypto_Cipher_doFinal(self, api_call):
         if "mode" in api_call["this"]:
-        if api_call["this"]["mode"] == 1:
-            self.droidmon["crypto_data"].append(api_call["args"][0])
-        else:
-            self.droidmon["crypto_data"].append(api_call["result"])
+            if api_call["this"]["mode"] == 1:
+                self.droidmon["crypto_data"].append(api_call["args"][0])
+            else:
+                self.droidmon["crypto_data"].append(api_call["result"])
 
     def _handle_java_lang_reflect_Method_invoke(self, api_call):
         reflection = ""
@@ -181,7 +181,7 @@ class Droidmon(Processing):
 
     def _handle_javax_crypto_Mac_doFinal(self, api_call):
         if len(api_call["args"]) > 0:
-        self.droidmon["mac_data"].append(api_call["args"][0])
+            self.droidmon["mac_data"].append(api_call["args"][0])
         else:
             if api_call["result"]:
                 self.droidmon["mac_data"].append(api_call["result"])
@@ -255,7 +255,7 @@ class Droidmon(Processing):
         self.lib_pairs(api_call, "findResource")
 
     def _handle_android_accounts_AccountManager_getAccounts(self, api_call):
-       self.droidmon["data_leak"].add("getAccounts")
+        self.droidmon["data_leak"].add("getAccounts")
 
     def _handle_android_telephony_SmsManager_sendMultipartTextMessage(self, api_call):
         self.droidmon["sms"].append({
@@ -279,15 +279,15 @@ class Droidmon(Processing):
         self.droidmon["loadDex"].add(api_call["args"][0])
 
     def _handle_dalvik_system_DexClass_dalvik_system_DexClassLoader(self, api_call):
-       self.droidmon["DexClassLoader"].append(api_call["args"])
+        self.droidmon["DexClassLoader"].append(api_call["args"])
 
     def _handle_dalvik_system_DexFile_dalvik_system_DexFile(self, api_call):
-       self.droidmon["DexFile"].append(api_call["args"])
+        self.droidmon["DexFile"].append(api_call["args"])
 
     def _handle_dalvik_system_PathClassLoader_dalvik_system_PathClassLoader(self, api_call):
         for arg in api_call["args"]:
             if type(arg) is str:
-        self.droidmon["PathClassLoader"].append(api_call["args"])
+                self.droidmon["PathClassLoader"].append(api_call["args"])
 
     def _handle_android_app_ActivityManager_killBackgroundProcesses(self, api_call):
         self.droidmon["killed_process"].append(api_call["args"][0])
@@ -361,7 +361,7 @@ class Droidmon(Processing):
         for current_key in self.droidmon[key]:
             if libname in current_key["libname"]:
                 break
-            else:
+        else:
             self.droidmon[key].append({
                 "libname": api_call["args"][0],
                 "result": api_call.get("result", ""),
@@ -395,7 +395,7 @@ class Droidmon(Processing):
             return results
 
         for line in open(log_path, "rb"):
-        try:
+            try:
                 api_call = json.loads(line.replace("$","_"))
             except Exception:
                 if line != "\n":
@@ -408,7 +408,7 @@ class Droidmon(Processing):
 
             if "raw" in self.options:
                 if self.options.raw:
-                        self.droidmon["raw"].append(self.keyCleaner(api_call))
+                    self.droidmon["raw"].append(self.keyCleaner(api_call))
 
             # Construct the function name of the handler for this event.
             api = "_handle_%s_%s" % (api_call["class"], api_call["method"])
@@ -417,7 +417,7 @@ class Droidmon(Processing):
             if fn:
                 try:
                     fn(api_call)
-        except Exception as e:
+                except Exception as e:
                     log.warning("problem handling "+api+":"+e.message)
             else:
                 self.droidmon["error"].append("Unhandled: %r" % line)
@@ -425,7 +425,7 @@ class Droidmon(Processing):
         for key, value in self.droidmon.items():
             if type(value) is set:
                 results[key] = list(value)
-                else:
+            else:
                 results[key] = value
 
         return results
