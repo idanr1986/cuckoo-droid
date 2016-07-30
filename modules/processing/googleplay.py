@@ -8,7 +8,7 @@ from zipfile import BadZipfile
 from analyzer.android_on_linux.lib.api.androguard import apk
 from lib.cuckoo.common.objects import File
 from analyzer.android_on_linux.lib.core.packages import choose_package
-from lib.api.googleplay.googleplay import GooglePlayAPI
+from lib.cuckoo.api.googleplay.googleplay import GooglePlayAPI
 from lib.cuckoo.common.abstracts import Processing
 from lib.cuckoo.common.exceptions import CuckooProcessingError
 
