@@ -1,5 +1,4 @@
 import re
-from lib.cuckoo.api.google_play_apps import app_exists
 
 #E-mail
 
@@ -39,9 +38,7 @@ def find_strings(strings):
                         if not re_file_filter.findall(package_string):
                             if package_string not in intresting_strings[regex]:
                                 intresting_strings[regex].append(package_string)
-                                if package_string not in intresting_strings["google_play_packages"]:
-                                    if app_exists(package_string):
-                                        intresting_strings["google_play_packages"].append(package_string)
+
                 elif regex == "e-mail":
                     if string not in intresting_strings[regex]:
                         intresting_strings[regex].append(string)
