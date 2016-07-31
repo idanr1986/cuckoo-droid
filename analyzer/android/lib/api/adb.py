@@ -151,3 +151,11 @@ def take_screenshot(filename):
     proc1= subprocess.Popen(["/system/bin/screencap","-p","/sdcard/"+filename], stdout=subprocess.PIPE)
     proc1.communicate()
     return "/sdcard/"+filename
+
+def check_package_on_top(package):
+    output = os.popen("/system/bin/dumpsys window windows").read()
+    for s in output.split("\n"):
+        if ("mFocusedApp" in s):
+            if package in s:
+                return True
+    return False
