@@ -151,7 +151,9 @@ def take_screenshot(filename):
     proc1= subprocess.Popen(["/system/bin/screencap","-p","/sdcard/"+filename], stdout=subprocess.PIPE)
     proc1.communicate()
     return "/sdcard/"+filename
-
+def simulate_touch(x,y):
+    os.popen("/system/bin/input tap "+x+" "+y).read()
+    
 def check_package_on_top(package):
     output = os.popen("/system/bin/dumpsys window windows").read()
     for s in output.split("\n"):
