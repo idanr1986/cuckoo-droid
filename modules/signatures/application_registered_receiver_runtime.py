@@ -17,8 +17,6 @@ class AndroidRegisteredReceiver(Signature):
             if "registered_receivers" in self.results["droidmon"]:
                 for receiver in self.results["droidmon"]["registered_receivers"]:
                     self.add_match(None,"Receiver", receiver)
-                return True
-            else:
-                return False
+            return self.has_matches()
         except:
             return False

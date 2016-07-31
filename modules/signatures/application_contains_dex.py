@@ -8,8 +8,8 @@ from lib.cuckoo.common.abstracts import Signature
 
 
 
-class Hidden_Payload(Signature):
-    name = "application_contains_apk"
+class ApplicationContainsDex(Signature):
+    name = "application_contains_dex"
     description = "Application Contains Secondary DEX File (Static)"
     severity = 2
     categories = ["android"]

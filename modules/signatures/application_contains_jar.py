@@ -8,8 +8,8 @@ from lib.cuckoo.common.abstracts import Signature
 
 
 
-class Hidden_Payload(Signature):
-    name = "application_contains_apk"
+class ApplicationContainsJar(Signature):
+    name = "application_contains_jar"
     description = "Application Contains Jar File (Static)"
     severity = 2
     categories = ["android"]

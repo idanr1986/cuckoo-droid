@@ -4,19 +4,20 @@
 
 from lib.cuckoo.common.abstracts import Signature
 
-class AndroidStopProcess(Signature):
-    name = "application_stopped_processes"
-    description = "Application Stopped Processes (Dynamic)"
-    severity = 3
+
+class ApplicationDroppedDex(Signature):
+    name = "application_dropped_dex"
+    description = "Application Dropped Dex File (Dynamic)"
+    severity = 1
     categories = ["android"]
     authors = ["idanr1986"]
     minimum = "0.5"
 
     def run(self):
         try:
-            if "killed_process" in self.results["droidmon"]:
-                for application_process in self.results["droidmon"]["killed_process"]:
-                    self.add_match(None, "Application Process", application_process)
+            if "dropped_dex" in self.results["droidmon"]:
+                for dex in self.results["droidmon"]["dropped_dex"]:
+                    self.add_match(None, "File", dex)
             return self.has_matches()
         except:
             return False

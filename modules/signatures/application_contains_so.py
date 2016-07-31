@@ -8,7 +8,7 @@ from lib.cuckoo.common.abstracts import Signature
 
 
 
-class Hidden_Payload(Signature):
+class ApplicationContainsSo(Signature):
     name = "application_contains_so"
     description = "Application Contains Shared Object Files (Static)"
     severity = 2

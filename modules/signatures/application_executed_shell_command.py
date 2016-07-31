@@ -17,8 +17,6 @@ class AndroidShellCommands(Signature):
             if "commands" in self.results["droidmon"]:
                 for command in self.results["droidmon"]["commands"]:
                     self.add_match(None, "Command", command)
-                return True
-            else:
-                return False
+            self.has_matches()
         except:
             return False

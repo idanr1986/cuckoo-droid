@@ -17,8 +17,6 @@ class AndroidPrivateInfoQuery(Signature):
             if "ContentResolver_queries" in self.results["droidmon"]:
                 for query in self.results["droidmon"]["ContentResolver_queries"]:
                     self.add_match(None,"Query", query)
-                return True
-            else:
-                return False
+                return self.has_matches()
         except:
             return False
