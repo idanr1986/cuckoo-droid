@@ -1,0 +1,129 @@
+<h4>Dynamic Analysis</h4>
+<div class="tabbable tabs">
+    <ul class="nav nav-pills" style="margin-bottom: 0;">
+        {% if "accounts" in analysis.droidmon %}<li class="active"><a href="#accounts_tab" data-toggle="tab">{% include "analysis/droidmon/images/accounts.html" %} Accounts</a></li>{% endif %}
+        {% if "commands" in analysis.droidmon %}<li><a href="#commands_tab" data-toggle="tab">{% include "analysis/droidmon/images/commands.html" %} Commands</a></li>{% endif %}
+        {% if "fingerprint" in analysis.droidmon %}<li><a href="#fingerprints_tab" data-toggle="tab">{% include "analysis/droidmon/images/forensics.html" %} Fingerprints</a></li>{% endif %}
+        {% if "registerContentObserver" in analysis.droidmon %}<li><a href="#content_observer_tab" data-toggle="tab">{% include "analysis/droidmon/images/observer.html" %} Content Observers</a></li>{% endif %}
+        {% if "ContentResolver_queries" in analysis.droidmon %}<li><a href="#content_resolver_tab" data-toggle="tab">{% include "analysis/droidmon/images/query.html" %}Content Queries</a></li>{% endif %}
+        {% if "ContentValues" in analysis.droidmon %}<li><a href="#content_values_tab" data-toggle="tab">{% include "analysis/droidmon/images/content.html" %} Content Values</a></li>{% endif %}
+        {% if "file_accessed" in analysis.droidmon %}<li><a href="#file_accessed_tab" data-toggle="tab">{% include "analysis/droidmon/images/files.html" %} Files Accessed</a></li>{% endif %}
+        {% if "crypto_keys" in analysis.droidmon %}<li><a href="#keys_tab" data-toggle="tab">{% include "analysis/droidmon/images/keys.html" %} Crypto Keys</a></li>{% endif %}
+        {% if "kill_process" in analysis.droidmon %}<li><a href="#kill_process_tab" data-toggle="tab">{% include "analysis/droidmon/images/kill.html" %} Stopped Processes</a></li>{% endif %}
+        {% if "crypto_data" in analysis.droidmon %}<li><a href="#crypto_data_tab" data-toggle="tab">{% include "analysis/droidmon/images/encrypt.html" %} Encryption Plaintext</a></li>{% endif %}
+        {% if "reflection_calls" in analysis.droidmon %}<li><a href="#reflection_calls_tab" data-toggle="tab">{% include "analysis/droidmon/images/reflection.html" %} Reflection Calls</a></li>{% endif %}
+        {% if "registered_receivers" in analysis.droidmon %}<li><a href="#registered_receivers_tab" data-toggle="tab">{% include "analysis/droidmon/images/broadcast.html" %} Registered Broadcast Receivers</a></li>{% endif %}
+        {% if "SharedPreferences" in analysis.droidmon %}<li><a href="#SharedPreferences_tab" data-toggle="tab">{% include "analysis/droidmon/images/prefrences.html" %}  Shared Preferences</a></li>{% endif %}
+        {% if "sms" in analysis.droidmon %}<li><a href="#sms_tab" data-toggle="tab">{% include "analysis/droidmon/images/sms.html" %}  SMS Messages</a></li>{% endif %}
+        {% if "SystemProperties" in analysis.droidmon %}<li><a href="#SystemProperties_tab" data-toggle="tab">{% include "analysis/droidmon/images/system_prop.html" %}  System Properties</a></li>{% endif %}
+        {% if "started_activities" in analysis.droidmon %}<li><a href="#started_activities_tab" data-toggle="tab">{% include "analysis/droidmon/images/intent.html" %}  Intents</a></li>{% endif %}
+        <li><a href="#dynamically_tab" data-toggle="tab">{% include "analysis/droidmon/images/library.html" %}  Dynamically Loaded Files</a></li>
+    </ul>
+    <div class="tab-content">
+        {% if "accounts" in analysis.droidmon %}
+        <div class="tab-pane fade in active" id="accounts_tab">
+            {% include "analysis/droidmon/accounts.html" %}
+        </div>
+        {% endif %}
+
+        {% if "commands" in analysis.droidmon %}
+        <div class="tab-pane fade" id="commands_tab">
+            {% include "analysis/droidmon/commands.html" %}
+        </div>
+        {% endif %}
+
+        {% if "registerContentObserver" in analysis.droidmon %}
+        <div class="tab-pane fade" id="content_observer_tab">
+            {% include "analysis/droidmon/content_observer.html" %}
+        </div>
+        {% endif %}
+
+        {% if "ContentResolver_queries" in analysis.droidmon %}
+        <div class="tab-pane fade" id="content_resolver_tab">
+            {% include "analysis/droidmon/content_resolver.html" %}
+        </div>
+        {% endif %}
+
+        {% if "ContentValues" in analysis.droidmon %}
+        <div class="tab-pane fade" id="content_values_tab">
+            {% include "analysis/droidmon/content_values.html" %}
+        </div>
+        {% endif %}
+
+        {% if "file_accessed" in analysis.droidmon %}
+        <div class="tab-pane fade" id="file_accessed_tab">
+            {% include "analysis/droidmon/files.html" %}
+        </div>
+        {% endif %}
+
+        {% if "fingerprint" in analysis.droidmon %}
+        <div class="tab-pane fade" id="fingerprints_tab">
+            {% include "analysis/droidmon/fingerprints.html" %}
+        </div>
+        {% endif %}
+
+        {% if "crypto_keys" in analysis.droidmon %}
+        <div class="tab-pane fade" id="keys_tab">
+            {% include "analysis/droidmon/keys.html" %}
+        </div>
+        {% endif %}
+
+        {% if "killBackgroundProcesses" in analysis.droidmon %}
+        <div class="tab-pane fade" id="kill_process_tab">
+            {% include "analysis/droidmon/kill_process.html" %}
+        </div>
+        {% endif %}
+
+        {% if "crypto_data" in analysis.droidmon %}
+        <div class="tab-pane fade" id="crypto_data_tab">
+            {% include "analysis/droidmon/plain_text.html" %}
+        </div>
+        {% endif %}
+
+
+        {% if "reflection_calls" in analysis.droidmon %}
+        <div class="tab-pane fade" id="reflection_calls_tab">
+            {% include "analysis/droidmon/reflection.html" %}
+        </div>
+        {% endif %}
+
+        {% if "registered_receivers" in analysis.droidmon %}
+        <div class="tab-pane fade" id="registered_receivers_tab">
+            {% include "analysis/droidmon/register_receiver.html" %}
+        </div>
+        {% endif %}
+
+        {% if "SharedPreferences" in analysis.droidmon %}
+        <div class="tab-pane fade" id="SharedPreferences_tab">
+            {% include "analysis/droidmon/shared_preferences.html" %}
+        </div>
+        {% endif %}
+
+        {% if "sms" in analysis.droidmon %}
+        <div class="tab-pane fade" id="sms_tab">
+            {% include "analysis/droidmon/sms.html" %}
+        </div>
+        {% endif %}
+
+        {% if "SystemProperties" in analysis.droidmon %}
+        <div class="tab-pane fade" id="SystemProperties_tab">
+            {% include "analysis/droidmon/system_prop.html" %}
+        </div>
+        {% endif %}
+
+        {% if "started_activities" in analysis.droidmon %}
+        <div class="tab-pane fade" id="started_activities_tab">
+            {% include "analysis/droidmon/start_intent.html" %}
+        </div>
+        {% endif %}
+
+        <div class="tab-pane fade" id="dynamically_tab">
+            {% include "analysis/droidmon/dynamically.html" %}
+        </div>
+
+
+
+    </div>
+</div>
+
+

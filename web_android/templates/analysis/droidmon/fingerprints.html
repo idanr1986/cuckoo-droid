@@ -1,0 +1,11 @@
+<section id="fingerprint">
+<div class="alert alert-success signature">
+        <table class="table table-striped table-bordered">
+        {% for call in analysis.droidmon.fingerprint %}
+        <tr>
+            <td><span class="mono" >{{call}}</span></td>
+        </tr>
+        {% endfor %}
+        </table>
+        </div>
+</section>

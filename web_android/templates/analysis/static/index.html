@@ -1,0 +1,60 @@
+<div class="tabbable tabs">
+    <ul class="nav nav-pills" style="margin-bottom: 0;">
+        {% if  analysis.apkinfo %}
+        <li class="active"><a href="#apk_info_tab" data-toggle="tab">Android Static Analysis</a></li>
+        <li><a href="#api_calls_tab" data-toggle="tab">Android Static API Calls</a></li>
+        {% if  analysis.apkinfo.certificate %}
+        <li><a href="#certificate_tab" data-toggle="tab">Certificate</a></li>
+        {% endif %}
+        {% if  analysis.apkinfo.files %}
+        <li><a href="#files_tab" data-toggle="tab">Files</a></li>
+        {% endif %}
+        {% endif %}
+        {% if analysis.info.category == "file" and not analysis.apkinfo %}<li><a href="#static_analysis_tab" data-toggle="tab">Static Analysis</a></li>{% endif %}
+
+        <li><a href="#static_strings_tab" data-toggle="tab">Strings</a></li>
+        <li><a href="#static_antivirus_tab" data-toggle="tab">Antivirus</a></li>
+
+        {% if analysis.googleplay %}<li><a href="#google_play_tab" data-toggle="tab">Google Play</a></li>{% endif %}
+    </ul>
+    <div class="tab-content">
+        {% if analysis.info.category == "file" and not analysis.apkinfo %}
+        <div class="tab-pane fade" id="static_analysis_tab">
+            {% if "PE32" in analysis.target.file.type %}
+                {% include "analysis/static/_pe32.html" %}
+            {% else %}
+                No static analysis available.
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="tab-pane fade" id="static_strings_tab">
+            {% include "analysis/static/_strings.html" %}
+        </div>
+        <div class="tab-pane fade" id="static_antivirus_tab">
+            {% include "analysis/static/_antivirus.html" %}
+        </div>
+        {% if  analysis.apkinfo %}
+        <div class="tab-pane fade in active" id="apk_info_tab">
+            {% include "analysis/static/_apk_info.html" %}
+        </div>
+
+        <div class="tab-pane fade" id="api_calls_tab">
+            {% include "analysis/static/_api_calls.html" %}
+        </div>
+
+        <div class="tab-pane fade" id="certificate_tab">
+            {% include "analysis/static/_certificate.html" %}
+        </div>
+
+        <div class="tab-pane fade" id="files_tab">
+            {% include "analysis/static/_files.html" %}
+        </div>
+        {% endif %}
+
+        {% if analysis.googleplay %}
+        <div class="tab-pane fade" id="google_play_tab">
+            {% include "analysis/static/_googleplay.html" %}
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,35 @@
+{% extends "base-report.html" %}
+{% block content %}
+    {% include "sections/info.html" %}
+    {% include "sections/errors.html" %}
+    {% if results.info.category == "file" %}
+        {% include "sections/file.html" %}
+    {% elif results.info.category == "url" %}
+        {% include "sections/url.html" %}
+    {% endif %}
+    {% if  results.apkinfo %}
+        {% include "sections/apkinfo.html" %}
+    {% endif %}
+    {% if results.googleplay %}
+        {% include "sections/googleplay.html" %}
+    {% endif %}
+    {% include "sections/signatures.html" %}
+    {% if results.droidmon %}
+        {% include "sections/droidmon.html" %}
+    {% endif %}
+    {% if results.apkinfo %}
+        {% include "sections/apicalls.html" %}
+    {% endif %}
+    {% include "sections/screenshots.html" %}
+    {% if results.info.category == "file" and not results.apkinfo %}
+        {% include "sections/static.html" %}
+    {% endif %}
+    {% if not results.apkinfo %}
+        {% include "sections/dropped.html" %}
+    {% endif %}
+    {% include "sections/network.html" %}
+    {% if not results.apkinfo %}
+        {% include "sections/behavior.html" %}
+    {% endif %}
+    {% include "sections/volatility.html" %}
+{% endblock %}

@@ -1,12 +1,11 @@
 .idea/
 .pyc
-
 .idea/workspace.xml
 
 web_android/analysis/__init__.pyc
 
 *.pyc
-*.DS_Store
+
 .idea/misc.xml
 
 *.pyc

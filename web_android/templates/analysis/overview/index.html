@@ -1,0 +1,24 @@
+{% if analysis.apkinfo.icon  %}
+{% include "analysis/overview/_icon.html" %}
+{% endif%}
+<hr />
+{% include "analysis/overview/_info.html" %}
+<hr />
+{% if analysis.info.category == "file" and analysis.target %}
+    {% include "analysis/overview/_file.html" %}
+{% elif analysis.info.category == "url" %}
+    {% include "analysis/overview/_url.html" %}
+{% endif %}
+<hr />
+{% include "analysis/overview/_signatures.html" %}
+<hr />
+{% include "analysis/overview/_screenshots.html" %}
+<hr />
+<div class="row">
+    <div class="col-xs-6">{% include "analysis/network/_hosts.html" %}</div>
+    <div class="col-xs-6">{% include "analysis/network/_dns.html" %}</div>
+</div>
+<hr />
+{% if analysis.static %}
+{% include "analysis/overview/_summary.html" %}
+{% endif%}

@@ -1,0 +1,15 @@
+{% if "killBackgroundProcesses" in results.droidmon %}
+    <div class="alert alert-error signature">
+        <h4><a href="javascript:showHide('kill_process');">{% include "sections/droidmon/images/kill.html" %}  Stopped Processes</a></h4>
+        <div id="kill_process" style="display: none;">
+        <table class="table table-striped table-bordered">
+            {% for call in results.droidmon["killBackgroundProcesses"] %}
+            <tr>
+                <td><span class="mono" >{{call}}</span></td>
+            </tr>
+            {% endfor %}
+
+        </table>
+        </div>
+    </div>
+{% endif %}

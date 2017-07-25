@@ -1,0 +1,8 @@
+<section id="static_strings">
+    {% load nbsp %}
+    <div class="well" style="font-family: monospace;">
+        {% if analysis.apkinfo.certificate %}
+            <div>{{analysis.apkinfo.certificate.text|nbsp|linebreaks}}</div>
+        {% endif %}
+    </div>
+</section>

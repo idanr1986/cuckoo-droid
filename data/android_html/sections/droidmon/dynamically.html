@@ -1,0 +1,74 @@
+{% if "DexClassLoader" in results.droidmon or
+    "findLibrary" in results.droidmon or
+    "indResources" in results.droidmon or
+    "findResource" in results.droidmon or
+    "DexFile" in results.droidmon or
+    "loadClass" in results.droidmon or
+    "loadDex" in results.droidmon or
+    "PathClassLoader" in results.droidmon %}
+
+    <div class="alert alert-warning signature">
+        <h4><a href="javascript:showHide('dynamically');">{% include "sections/droidmon/images/library.html" %}  Dynamically Loaded Files</a></h4>
+        <div id="dynamically" style="display: none;">
+            <table class="table table-striped table-bordered">
+                {% if "DexClassLoader" in results.droidmon  %}
+                {% for call in results.droidmon["DexClassLoader"] %}
+                <tr>
+                    <td><span class="mono">{{call[0]}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+                {% if "findLibrary" in results.droidmon  %}
+                {% for call in results.droidmon["findLibrary"] %}
+                <tr>
+                    <td><span class="mono">Library Name:{{call.libname}} ,Library Path:{{call.result}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+
+                {% if "findResource" in results.droidmon  %}
+                {% for call in results.droidmon["findResource"] %}
+                <tr>
+                    <td><span class="mono">Find Resources:{{call.libname}},Library Path:{{call.result}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+                {% if "DexFile" in results.droidmon  %}
+                {% for call in results.droidmon["DexFile"] %}
+                <tr>
+                    <td><span class="mono">DexFile:{{call[0]}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+                {% if "loadClass" in results.droidmon  %}
+                {% for call in results.droidmon["loadClass"] %}
+                <tr>
+                    <td><span class="mono">loadClass:{{call.libname}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+                {% if "loadDex" in results.droidmon  %}
+                {% for call in results.droidmon["loadDex"] %}
+                <tr>
+                    <td><span class="mono">loadDex:{{call}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+                {% if "PathClassLoader" in results.droidmon  %}
+                {% for call in results.droidmon["PathClassLoader"] %}
+                <tr>
+                    <td><span class="mono">PathClassLoader:{{call[0]}}</span></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+            </table>
+        </div>
+    </div>
+    {% endif %}

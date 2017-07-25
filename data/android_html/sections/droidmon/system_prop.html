@@ -1,0 +1,14 @@
+{% if "SystemProperties" in results.droidmon  %}
+    <div class="alert alert-warning signature">
+            <h4><a href="javascript:showHide('system_prop');">{% include "sections/droidmon/images/system_prop.html" %}  System Properties</a></h4>
+            <div id="system_prop" style="display: none;">
+                <table class="table table-striped table-bordered">
+                {% for call in results.droidmon["SystemProperties"] %}
+                <tr>
+                    <td><span class="mono"><pre>{{call}}</pre></span></td>
+                </tr>
+                 {% endfor %}
+                </table>
+            </div>
+     </div>
+{% endif %}

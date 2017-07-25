@@ -1,0 +1,14 @@
+{% if "TelephonyManager_listen" in results.droidmon  %}
+     <div class="alert alert-warning signature">
+            <h4><a href="javascript:showHide('telephone_state_listen');">{% include "sections/droidmon/images/telephone.html" %}  Telephone State Listen</a></h4>
+            <div id="telephone_state_listen" style="display: none;">
+                <table class="table table-striped table-bordered">
+                {% for call in results.droidmon["TelephonyManager_listen"] %}
+                    <tr>
+                        <td><span class="mono">{{call}}</span></td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+     </div>
+{% endif %}

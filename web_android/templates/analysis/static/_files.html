@@ -1,0 +1,19 @@
+<section id="files">
+    <div class="well" style="font-family: monospace;">
+        {% if analysis.apkinfo.files %}
+        <table class="table table-striped table-bordered">
+        {% for file in  analysis.apkinfo.files %}
+           <tr>
+               <td>{{file.name}}</td>
+               <td>
+                   {% for key, value in  file.items %}
+                        <span class='sign-key'>{{key}}</span>
+                        <span class='sign-value'>{{value}}</span><br />
+                   {% endfor %}
+               </td>
+           </tr>
+        {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</section>

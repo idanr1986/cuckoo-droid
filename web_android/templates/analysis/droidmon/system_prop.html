@@ -1,0 +1,11 @@
+<section id="SystemProperties">
+    <div class="alert alert-warning signature">
+        <table class="table table-striped table-bordered">
+        {% for call in analysis.droidmon.SystemProperties %}
+        <tr>
+             <td><span class="mono"><pre>{{call}}</pre></span></td>
+        </tr>
+        {% endfor %}
+        </table>
+        </div>
+</section>

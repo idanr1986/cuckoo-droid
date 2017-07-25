@@ -1,0 +1,66 @@
+<section id="dynamically">
+    <div class="alert alert-warning signature">
+        <table class="table table-striped table-bordered">
+        {% if "DexClassLoader" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.DexClassLoader %}
+        <tr>
+            <td><span class="mono">{{call.0}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if "findLibrary" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.findLibrary %}
+        <tr>
+            <td><span class="mono">Library Name:{{call.libname}} ,Library Path:{{call.result}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+
+        {% if "findResource" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.findResource %}
+        <tr>
+            <td><span class="mono">Find Resources:{{call.libname}},Library Path:{{call.result}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if "DexFile" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.DexFile %}
+        <tr>
+            <td><span class="mono">DexFile:{{call.0}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if "loadClass" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.loadClass %}
+        <tr>
+            <td><span class="mono">loadClass:{{call.libname}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if "loadDex" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.loadDex %}
+        <tr>
+            <td><span class="mono">loadDex:{{call}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if "PathClassLoader" in analysis.droidmon  %}
+        {% for call in analysis.droidmon.PathClassLoader %}
+        <tr>
+            <td><span class="mono">PathClassLoader:{{call.0}}</span></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+
+
+        </table>
+        </div>
+</section>
+
