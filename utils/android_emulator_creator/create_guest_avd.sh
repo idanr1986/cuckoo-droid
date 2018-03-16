@@ -44,7 +44,7 @@ $ADB install apps/ImportContacts.apk
 
 # Install Cuckoo Agent and Python for ARM
 echo "Installing Cuckoo Agent and Python for ARM"
-$ADB push ../../agent/android/python_agent/ /data/local/
+$ADB push ../../agent/android/python_agent/* /data/local/
 $ADB shell chmod 06755 /data/local/aapt
 $ADB shell chmod 06755 /data/local/agent.sh
 $ADB shell chmod 06755 /data/local/python/bin/python
