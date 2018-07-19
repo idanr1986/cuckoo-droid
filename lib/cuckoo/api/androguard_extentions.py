@@ -1,167 +1,172 @@
-from androguard.core.analysis.analysis import PathVar, TAINTED_PACKAGE_CALL
-from androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
+from androguard.core.bytecodes import apk, dvm
+from androguard.core.analysis.analysis import Analysis
+from androguard.core.androconf import load_api_specific_resource_module
+
 
 
 def get_methods(vmx):
+    """
+    This method gives us information about a methods in an apk.
+    :param vmx: androguard.core.analysis.analysis.Analysis
+    :return: list of dics of methods [{"class":value,"name":value,"params":value,"return":value}]
+    :rtype: list of dics
+    """
     methods = []
-    for i in vmx.get_methods():
+    for vm in vmx.vms:  # todo:Test for multiple dex files in one apk?
         method = {}
-        i.create_tags()
-        if not i.tags.empty():
-            proto = i.method.proto.replace("(", "").replace(";", "")
-            protos = proto.split(")")
-            params = protos[0].split(" ")
-            method["class"] = i.method.get_class_name().replace(";", "")
-            method["name"] = i.method.name
-            if params and params[0]:
-                method["params"] = params
-            method["return"] = protos[1]
+        for m in vm.get_methods():
+            method["class"] = dvm.get_type(m.get_class_name())  # get rid of L in start of class
+            method["name"] = dvm.get_type(m.get_name())
+            info = m.get_information()
+            if "params" in info:
+                method["params"] = []
+                for param in info["params"]:
+                    method["params"].append(param[1])
+            if "return" in info:
+                method["return"] = info["return"]
             methods.append(method)
     return methods
 
+
+# Fixme: Description & action are resources, how to resolve them? https://github.com/androguard/androguard/issues/529
 def get_permissions(apk):
     """
         Return permissions with details
-
         :rtype: list of string
     """
     permission_list = []
 
-    for i in apk.get_permissions() :
-        perm = i
-        pos = i.rfind(".")
+    # {permission: [protectionLevel, label, description]}
+    # https://github.com/androguard/androguard/issues/529
 
-        if pos != -1 :
-            perm = i[pos+1:]
-
-        a={}
-
-        try :
-            temp = DVM_PERMISSIONS["MANIFEST_PERMISSION"][ perm ]
-            a["name"]=i
-            a["severity"]=temp[0]
-            a["action"]=temp[1]
-            a["description"]=temp[2]
-
-        except KeyError :
-            a["name"]=i
-            a["severity"]="dangerous"
-            a["action"]="Unknown permission from android reference"
-            a["description"]="Unknown permission from android reference"
-
-        permission_list.append(a)
-
+    for name, detail in apk.get_details_permissions().items():
+        perm = dict()
+        perm["name"] = name
+        perm["severity"] = detail[0]
+        perm["action"] = detail[1]
+        perm["description"] = detail[2]
+        permission_list.append(perm)
     return permission_list
+
 
 def get_extended_receivers(apk):
     """
     Return the android:name attribute of all receivers
-
     :rtype: a list of string
     """
-    manifest =apk.get_AndroidManifest().getElementsByTagName("manifest")[0]
+    manifest = apk.xml["AndroidManifest.xml"]
     receivers = []
-    application = manifest.getElementsByTagName("application")[0]
-    for receiver in application.getElementsByTagName("receiver"):
-        intents = receiver.getElementsByTagName("intent-filter")
+    application = manifest.findall("application")[0]
+    for receiver in application.findall("receiver"):
+        intents = receiver.findall("intent-filter")
         for intent in intents:
-            actions = intent.getElementsByTagName("action")
+            actions = intent.findall("action")
             for action in actions:
-                receivers.append(action.attributes["android:name"].value)
-
+                receivers.append(action.get("{http://schemas.android.com/apk/res/android}name"))
     return receivers
 
-def get_show_Permissions(dx):
-    p = dx.get_permissions( [] )
+
+# https://github.com/androguard/androguard/issues/222
+# https://github.com/androguard/androguard/issues/222#issue-215746838
+def get_show_Permissions(vmx):
+    """
+    Checks for functions that need permissions
+    :param vmx: Analysis object of vm
+    :return: dict of permissions {permission, XrefsFrom}
+    :rtype: dictionary
+    """
+
     permissions = {}
-    for i in p :
-        paths=[]
-        #print i, ":"
-        for j in p[i] :
-           paths.append(get_show_Path(dx.get_vm(), j))
-        permissions[i.replace("android.permission.", "").replace(".", "_")] = paths
+    permission_dict = load_api_specific_resource_module("api_permission_mappings", 16)
+    mca_dict = dict()
+    for ca in vmx.get_classes():
+        for mca in ca.get_methods():
+            mca_dict["{}-{}-{}".format(ca.orig_class.name, mca.get_method().get_name(), mca.get_method().get_descriptor())] = mca;
+
+    methods = set(permission_dict.keys()) & set(mca_dict.keys())
+
+    for method in methods:
+        xrefs_from = list()
+        for ref_class, ref_method, offset in mca_dict[method].get_xref_from():
+            xrefs_from.append("%s %s->%s%s (0x%x) ---> %s->%s%s" % (ref_method.get_access_flags_string(),  # Fixme: What was path access flag?
+                                                        dvm.get_type(ref_method.get_class_name()),
+                                                        dvm.get_type(ref_method.get_name()),
+                                                        ref_method.get_descriptor(),
+                                                        offset,
+                                                        dvm.get_type(mca.get_method().get_class_name()),
+                                                        dvm.get_type(mca.get_method().get_name()),
+                                                        dvm.get_type(mca.get_method().get_descriptor())))
+        for permission in permission_dict[method]:
+            perm_key = permission.replace("android.permission.", "").replace(".", "_")
+            if perm_key not in permissions:
+                permissions[perm_key] = list()
+            permissions[perm_key].extend(xrefs_from)
     return permissions
 
-def get_show_Path(vm, path) :
-  cm = vm.get_class_manager()
 
-  if isinstance(path, PathVar) :
-    dst_class_name, dst_method_name, dst_descriptor =  path.get_dst( cm )
-    info_var = path.get_var_info()
-    return "%s %s (0x%x) ---> %s->%s%s" % (path.get_access_flag(),
-                                          info_var,
-                                          path.get_idx(),
-                                          dst_class_name,
-                                          dst_method_name,
-                                          dst_descriptor)
-  else :
-    if path.get_access_flag() == TAINTED_PACKAGE_CALL :
-      src_class_name, src_method_name, src_descriptor =  path.get_src( cm )
-      dst_class_name, dst_method_name, dst_descriptor =  path.get_dst( cm )
 
-      return "%d %s->%s%s (0x%x) ---> %s->%s%s" % (path.get_access_flag(),
-                                                  src_class_name,
-                                                  src_method_name,
-                                                  src_descriptor,
-                                                  path.get_idx(),
-                                                  dst_class_name,
-                                                  dst_method_name,
-                                                  dst_descriptor)
-    else :
-      src_class_name, src_method_name, src_descriptor =  path.get_src( cm )
-      return "%d %s->%s%s (0x%x)" % (path.get_access_flag(),
-                                    src_class_name,
-                                    src_method_name,
-                                    src_descriptor,
-                                    path.get_idx() )
+def search_methods(vmx, method_regex):
+    """
+    Looks for all occurrences in which method specified by method_regex is called. It uses Xrefs.
+    :param vmx: Analysis object
+    :param method_regex: String for specifying method
+    :return: List of paths (caller --> callee)
+    """
+    list_paths = []
+    for mca in vmx.find_methods(method_regex):
+        for ref_class, ref_method, offset in mca.get_xref_from():
+            list_paths.append("%s %s->%s%s (0x%x) ---> %s->%s%s" % (ref_method.get_access_flags_string(),  # Fixme: What was path access flag?
+                                                        dvm.get_type(ref_method.get_class_name()),
+                                                        dvm.get_type(ref_method.get_name()),
+                                                        dvm.get_type(ref_method.get_descriptor()),
+                                                        offset,
+                                                        dvm.get_type(mca.get_method().get_class_name()),
+                                                        dvm.get_type(mca.get_method().get_name()),
+                                                        dvm.get_type(mca.get_method().get_descriptor())))
+    return list_paths
 
-def get_show_DynCode(dx) :
+
+def get_show_DynCode(vmx):
     """
         Show where dynamic code is used
-        :param dx : the analysis virtual machine
-        :type dx: a :class:`VMAnalysis` object
+        :param vmx : the analysis virtual machine
+        :type vmx: a :class:`Analysis` object
+        :return: List of paths (caller --> callee)
     """
-    paths = dx.get_tainted_packages().search_methods( "Ldalvik/system/DexClassLoader;", ".", ".")
-    return get_show_Paths( dx.get_vm(), paths )
+    return search_methods(vmx, "Ldalvik/system/DexClassLoader;",)
 
-def get_show_NativeMethods(dx) :
+
+def get_show_NativeMethods(vmx):
     """
         Show the native methods
-        :param dx : the analysis virtual machine
-        :type dx: a :class:`VMAnalysis` object
+        :param vmx : the analysis virtual machine
+        :type vmx: a :class:`Analysis` object
     """
-    native=[]
-    d = dx.get_vm()
-    for i in d.get_methods() :
-        if i.get_access_flags() & 0x100 :
-            native.append( i.get_class_name()+ i.get_name()+ i.get_descriptor())
-            #native.append(get_show_Path(d,i))
+    native = []
+
+    for d in vmx.vms:
+        for i in d.get_methods() :
+            if i.get_access_flags() & 0x100 :
+                native.append( i.get_class_name()+ i.get_name()+ i.get_descriptor())
+                #native.append(get_show_Path(d,i))
     return native
 
-def get_show_ReflectionCode(dx) :
+
+def get_show_ReflectionCode(vmx):
     """
         Show the reflection code
-        :param dx : the analysis virtual machine
-        :type dx: a :class:`VMAnalysis` object
+        :param vmx : the analysis virtual machine
+        :type vmx: a :class:`Analysis` object
+        :return: List of paths (caller --> callee)
     """
-    paths = dx.get_tainted_packages().search_methods( "Ljava/lang/reflect/Method;", ".", ".")
-    return get_show_Paths( dx.get_vm(), paths )
+    return search_methods(vmx,"Ljava/lang/reflect/Method;", )
 
-def get_show_CryptoCode(dx) :
+
+def get_show_CryptoCode(vmx):
     """
         Show the reflection code
-        :param dx : the analysis virtual machine
-        :type dx: a :class:`VMAnalysis` object
+        :param vmx : the analysis virtual machine
+        :type vmx: a :class:`Analysis` object
+        :return: List of paths (caller --> callee)
     """
-    paths = dx.get_tainted_packages().search_methods( "Ljavax/crypto/.", ".", ".")
-    return get_show_Paths( dx.get_vm(), paths )
-
-def get_show_Paths(vm, paths) :
-    """
-        Show paths of packages
-        :param paths: a list of :class:`PathP` objects
-    """
-    list =[]
-    for path in paths :
-        list.append(get_show_Path( vm, path ))
-    return list
+    return search_methods(vmx,"Ljavax/crypto/.", )

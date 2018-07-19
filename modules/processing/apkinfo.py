@@ -16,9 +16,8 @@ from lib.cuckoo.api.intresting_strings import find_strings
 try:
     from androguard.core.bytecodes.apk import APK
     from androguard.core.bytecodes.dvm import DalvikVMFormat
-    from androguard.core.analysis.analysis import uVMAnalysis, PathVar, TAINTED_PACKAGE_CALL, is_crypto_code
+    from androguard.core.analysis.analysis import Analysis
     from androguard.core.analysis import analysis
-    from androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
     HAVE_ANDROGUARD = True
 except ImportError:
     HAVE_ANDROGUARD = False
@@ -113,8 +112,10 @@ class ApkInfo(Processing):
                     if file["size"] < self.options.decompilation_threshold:
                         return True
                     else:
+                        log.warning("Dex size bigger than decompilation_threshold " + str(file["size"]) + " > " + str(self.options.decompilation_threshold))
                         return False
                 else:
+                    log.warning("decompilation_threshold not defined, decompiling")
                     return True
         return False
 
@@ -178,7 +179,7 @@ class ApkInfo(Processing):
                 manifest["receivers"] = a.get_receivers()
                 manifest["receivers_actions"] = get_extended_receivers(a)
                 manifest["providers"] = a.get_providers()
-                manifest["libraries"] = a.get_libraries()
+                manifest["libraries"] = list(a.get_libraries())
                 apkinfo["manifest"] = manifest
 
                 apkinfo["icon"] = get_apk_icon(self.file_path)
@@ -197,19 +198,25 @@ class ApkInfo(Processing):
                 if self.options.decompilation:
                     if self.check_size(apkinfo["files"]):
                         vm = DalvikVMFormat(a.get_dex())
-                        vmx = uVMAnalysis(vm)
+                        vmx = Analysis(vm)
+                        vmx.create_xref()
 
                         static_calls["all_methods"] = get_methods(vmx)
-                        static_calls["is_native_code"] = analysis.is_native_code(vmx)
-                        static_calls["is_dynamic_code"] = analysis.is_dyn_code(vmx)
-                        static_calls["is_reflection_code"] = analysis.is_reflection_code(vmx)
-                        static_calls["is_crypto_code"] = is_crypto_code(vmx)
+                        static_calls["permissions_method_calls"] = get_show_Permissions(vmx)
+
+                        static_calls["native_method_calls"] = get_show_NativeMethods(vmx)
+                        static_calls["is_native_code"] = bool(static_calls["native_method_calls"]) # True if not empty, False if empty
 
                         static_calls["dynamic_method_calls"] = get_show_DynCode(vmx)
+                        static_calls["is_dynamic_code"] = bool(static_calls["dynamic_method_calls"])
+
                         static_calls["reflection_method_calls"] = get_show_ReflectionCode(vmx)
-                        static_calls["permissions_method_calls"] = get_show_Permissions(vmx)
+                        static_calls["is_reflection_code"] = bool(static_calls["reflection_method_calls"])
+
                         static_calls["crypto_method_calls"] = get_show_CryptoCode(vmx)
-                        static_calls["native_method_calls"] = get_show_NativeMethods(vmx)
+                        static_calls["is_crypto_code"] = bool(static_calls["crypto_method_calls"])
+
+
 
                         classes = list()
                         for cls in vm.get_classes():
@@ -217,14 +224,12 @@ class ApkInfo(Processing):
 
                         static_calls["classes"] = classes
 
-                else:
-                    log.warning("Dex size bigger than: %s",
-                                self.options.decompilation_threshold)
+                    else:
+                        log.warning("Aborted decompilation, static extraction of calls not perforemd",)
 
                 apkinfo["static_method_calls"] = static_calls
 
         except (IOError, OSError, BadZipfile) as e:
             raise CuckooProcessingError("Error opening file %s" % e)
-
         return apkinfo
 

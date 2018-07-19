@@ -88,6 +88,10 @@ Host Configuration
 	#he can really consume performance from the cuckoo host ,so it's recommended to limit the size of dex that you will decompile
 	#decompilation_threshold=2000000
 	
+	# disbale or enable decompilation, used for static info on reflection, crypto
+	# dynamic loading, native calls and permissions extraction from code
+	decompilation = yes 
+	
 ``conf/reporting.conf`` configuration::	
 	
 	[reporthtml]

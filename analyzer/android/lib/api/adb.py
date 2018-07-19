@@ -11,20 +11,20 @@ import string
 import subprocess
 from zipfile import BadZipfile
 from lib.api.androguard import apk
+from lib.api.mypopen import MyPopen
 
 log = logging.getLogger()
 
 def install_sample(path):
     """Install the sample on the emulator via adb"""
     log.info("installing sample on emulator: pm install "+path)
-    str=""
-    #proc = subprocess.Popen(["/system/bin/pm", "install", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    str =os.popen("/system/bin/pm install "+path).read()
-    #for s in stdout:
-    #    str=str+s
+    stdout, stderr = subprocess.Popen("/system/bin/pm install "+path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True, executable="/system/bin/sh").communicate()
 
-    log.info(str)
-    lines = str.split("\n")
+    if len(stdout) > 0:
+        log.info("pm install stdout: " + stdout)
+    if len(stderr) > 0:
+        log.info("pm install stderr: " + stderr)
+    lines = stderr.split("\n")
     for line in lines:
         #if in command output will appear "Failure" it means that the sample did not install
         if("Failure" in line):
@@ -34,10 +34,8 @@ def install_sample(path):
 def get_package_activity_name(path):
     """Using the Android Asset Packaging Tool to extract from apk the package name and main activity"""
     shellcommand = "/data/local/aapt dump badging " + path
-    str =os.popen(shellcommand).read()
-    apkInfo=str.splitlines()
-    #process = subprocess.Popen(shellcommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    #apkInfo = process.communicate()[0].splitlines()
+    process = subprocess.Popen(shellcommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable="/system/bin/sh")
+    apkInfo = process.communicate()[0].splitlines()
     package=""
     activity=""
 
@@ -106,15 +104,18 @@ def get_package_activity_name_androguard(path):
 
 def execute_sample(package,activity):
     """Execute the sample on the emulator via adb"""
-    log.info("executing sample on emulator:adb shell am start -n " +package+"/"+activity)
-    str=""
-    #proc = subprocess.Popen(["/system/bin/am","start","-n", package+"/"+activity], stdout=subprocess.PIPE, stderr=subprocess.PIPE)#adb shell am start -n $pkg/$act
-    str = os.popen("/system/bin/am start -n "+package+"/"+activity).read()
-    lines = str.split("\n")
-    for line in lines:
-        if("Error" in line):
-            #if in command output will appear "Error" it means that the sample did not execute
-            raise CuckooPackageError("failed to execute sample on emulator:"+line)
+    log.debug("executing sample on emulator :adb shell am start -n " +package+"/"+activity)
+    try:
+        with MyPopen("/system/bin/am start -n "+ package + "/" + activity,
+                     stdout=subprocess.PIPE,
+                     shell=True,
+                     stderr=subprocess.PIPE,
+                     executable='/system/bin/sh') as proc:  # adb shell am start -n $pkg/$act
+
+            log.info(str(proc.communicate()))
+    except Exception as e:
+        log.info("Exception in Popen: %s",e)
+
 
 def dump_droidmon_logs(package):
     filename="/data/data/de.robv.android.xposed.installer/log/error.log"
@@ -136,7 +137,7 @@ def dump_droidmon_logs(package):
 def execute_browser(url):
     """Execute the url on the emulator via adb"""
     str=""
-    proc = subprocess.Popen(["am","start","-a","android.intent.action.VIEW", "-d", url], stdout=subprocess.PIPE)
+    proc = subprocess.Popen("am start -a android.intent.action.VIEW -d " + url, stdout=subprocess.PIPE, shell = True, executable="/system/bin/sh")
     for s in proc.stdout.xreadlines():
         log.info(s)
         str=str+s
@@ -144,20 +145,68 @@ def execute_browser(url):
     lines = str.split("\n")
     for line in lines:
         if("Error" in line):
-            #if in command output will appear "Error" it means that the url did not execute
             raise CuckooPackageError("failed to execute default browser on emulator:"+line)
 
 def take_screenshot(filename):
-    proc1= subprocess.Popen(["/system/bin/screencap","-p","/sdcard/"+filename], stdout=subprocess.PIPE)
+    proc1= subprocess.Popen("/system/bin/screencap -p /sdcard/"+filename, stdout=subprocess.PIPE, shell=True,
+                                stderr=subprocess.PIPE,
+                                executable='/system/bin/sh')
     proc1.communicate()
     return "/sdcard/"+filename
+
 def simulate_touch(x,y):
-    os.popen("/system/bin/input tap "+x+" "+y).read()
-    
+    #log.info("simulating touch")
+    cmd = "/system/bin/input tap "+x+" "+y
+    try:
+        stdout, stderr = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True,
+                            executable="/system/bin/sh").communicate()
+        log.info("Simulated touch " + cmd)
+        if len(stdout)>0:
+            log.info("simulate touch stdout :" +  stdout)
+        if len(stderr)>0:
+            log.info("simulate touch stderr :" + stderr)
+    except Exception as e:
+        log.debug("Exception in simulate touch : ", str(e))
+
 def check_package_on_top(package):
-    output = os.popen("/system/bin/dumpsys window windows").read()
-    for s in output.split("\n"):
-        if ("mFocusedApp" in s):
-            if package in s:
-                return True
-    return False
+    try:
+        #output = os.popen("/system/bin/dumpsys window windows").read()
+        proc = subprocess.Popen("/system/bin/dumpsys window windows", stdout=subprocess.PIPE, shell=True,
+                                stderr=subprocess.PIPE,
+                                executable='/system/bin/sh')
+        stdout, stderr = proc.communicate()
+        for s in stdout.split("\n"):
+            if ("mFocusedApp" in s):
+                if package in s:
+                    return True
+        return False
+    except Exception as e:
+        log.info("Exception in check_package_on_top" + str(e))
+        return False
+
+
+def get_package_on_top():
+    try:
+        proc = subprocess.Popen("/system/bin/dumpsys window windows", stdout=subprocess.PIPE, shell=True,
+                                stderr=subprocess.PIPE,
+                                executable='/system/bin/sh')
+        output, stderr = proc.communicate()
+
+        for s in output.split("\n"):
+            if ("mFocusedApp" in s):
+                return s[s.find("ActivityRecord"):].split(" ")[1].split("/")[0]
+    except Exception as e:
+        log.info("Exception in get_package_on_top" + str(e))
+
+
+def get_intents(path):
+    a = apk.APK(path)
+    if a.is_valid_APK():
+        manifestxml = a.xml["AndroidManifest.xml"]
+
+        intents = []
+
+        for intent in manifestxml.getElementsByTagName("intent-filter"):
+            for action in intent.getElementsByTagName("action"):
+                intents.append(action.getAttribute("android:name"))
+        return intents

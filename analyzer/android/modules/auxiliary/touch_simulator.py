@@ -34,8 +34,8 @@ class TouchSimulator(Auxiliary, Thread):
             time.sleep(DELAY)
             if adb.check_package_on_top("com.android.settings/.DeviceAdminAdd"):
                 log.info("TouchSimulator - Device Admin Granted")
+                time.sleep(DELAY)
                 adb.simulate_touch("386","753")
-                adb.simulate_touch("627","540")
             elif adb.check_package_on_top("com.android.packageinstaller/.PackageInstallerActivity") or adb.check_package_on_top("com.android.packageinstaller/.InstallAppProgress"):
                 log.info("TouchSimulator - Package Installer")
                 adb.simulate_touch("386","753")

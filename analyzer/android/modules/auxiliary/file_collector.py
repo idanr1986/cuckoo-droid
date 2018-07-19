@@ -33,7 +33,7 @@ class FileCollector(Auxiliary, Thread):
     def run(self):
 
         label = "Droidmon-apimonitor-"
-        adb = subprocess.Popen(["logcat", "-s", "Xposed"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        adb = subprocess.Popen("logcat -s Xposed", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, executable='/system/bin/sh')
         md5_list = set()
         #  Collect Xposed logs
         while self.do_run:
